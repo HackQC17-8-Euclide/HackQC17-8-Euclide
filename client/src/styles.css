@@ -1,1 +1,30 @@
 /* You can add global styles to this file, and also import other style files */
+div {
+    display : inline-block
+}
+
+.header{
+    top: 0;
+    text-align: center;
+    font-size: 25px;
+    height: 40px;
+    position: absolute;
+    width: 100%;
+    color: white;
+    opacity: .9;
+    background: deepskyblue;
+    z-index: 9999;
+    left: 0px;
+    right : 0px;
+    vertical-align: middle;
+    display : table-cell;
+    line-height: 40px;
+    margin: 0;
+}
+
+
+.title {
+    height: 40px;
+    line-height: 40px;
+    margin: 0;
+}
