@@ -14,7 +14,9 @@ class GtfsController {
     public $StopTimeCtrl;
     public $timeLoad;
     function __construct($path) {
+        global $DB;
         $this->path = $path;
+        $this->log_path = $path;
 
             // gtfs_zone
         // gtfs_agency
@@ -30,10 +32,13 @@ class GtfsController {
         // gtfs_frequency
         // gtfs_shape_stops
 
+
         $this->AgencyCtrl = new \HackQC17_8_Euclide\GFTS\GtfsAgencyController($this->path.'agency.txt', $this);
+        if (!empty($this->AgencyCtrl->curAgencyPk))
+            $DB->exec("DELETE FROM gtfs_agency WHERE pk = ".$this->AgencyCtrl->curAgencyPk);
         $this->StopCtrl = new \HackQC17_8_Euclide\GFTS\GtfsStopController($this->path.'stops.txt', $this);
-            $this->AgencyCtrl->list[0]['spatialExtent'] = $this->StopCtrl->spatialExtent;
-            // $this->AgencyCtrl->export();
+            $this->AgencyCtrl->list[$this->AgencyCtrl->curAgencyId]['spatialExtent'] = $this->StopCtrl->spatialExtent;
+            $this->AgencyCtrl->export();
             // $this->StopCtrl->export();
         $this->RouteCtrl = new \HackQC17_8_Euclide\GFTS\GtfsRouteController($this->path.'routes.txt', $this);
         $this->CalendarCtrl = new \HackQC17_8_Euclide\GFTS\GtfsCalendarController($this->path.'calendar.txt', $this);

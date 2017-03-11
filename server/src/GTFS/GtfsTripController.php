@@ -19,7 +19,11 @@ class GtfsTripController extends GtfsElemController {
             'block_id' => !isset($elem['block_id'])?null:$elem['block_id'],
             'shape_id' => !isset($elem['shape_id'])?null:$elem['shape_id'],
             'wheelchair_accessible' => !isset($elem['wheelchair_accessible'])?null:$elem['wheelchair_accessible']*1,
-            'bikes_allowed' => !isset($elem['bikes_allowed'])?null:$elem['bikes_allowed']
+            'bikes_allowed' => !isset($elem['bikes_allowed'])?null:$elem['bikes_allowed'],
+            'departure_time' => null,
+            'arrival_time' => null,
+            'departure_sec' => null,
+            'arrival_sec' => null
         ];
         if (!empty($trip['shape_id']) && !empty($this->CurGtfsCtrl->ShapeCtrl)) {
             if (!isset($this->CurGtfsCtrl->ShapeCtrl->list[$trip['shape_id']])) { // ben ils ont oublié d'ajouter un shape dans le GTFS...

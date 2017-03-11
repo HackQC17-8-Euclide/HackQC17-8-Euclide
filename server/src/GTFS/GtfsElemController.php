@@ -6,8 +6,12 @@ class GtfsElemController {
     public $CurGtfsCtrl;
     public $list;
     public $timeLoad;
+    public $timeInsert;
+    public $table;
+    public $DB_fields_mapping;
     function __construct($path, $CurGtfsCtrl) {
         $this->timeLoad = null;
+        $this->timeInsert = null;
         $this->CurGtfsCtrl = $CurGtfsCtrl;
         $this->list = [];
         if (file_exists($path))
@@ -41,8 +45,49 @@ class GtfsElemController {
         return $this->list;
     }
 
+    public function export() {
+        global $DB;
+        $this->DB_fields_mapping;
+        $start = microtime(true);
+        $headSql = "INSERT INTO $this->table (".implode(', ', array_keys($this->DB_fields_mapping)).") VALUES ";
+        $rowsSql = []; $count = 0;
+        foreach ($this->list as $key => $elem) {
+            $elem = $this->parseDateForInsert($elem);
+            $fieldsForInsert = [];
+            foreach ($this->DB_fields_mapping as $key => $type)
+                $fieldsForInsert[$key] = ($type=='string')?'"'.str_replace('"', '', $elem[$key]).'"':((empty($elem[$key]) && $elem[$key]!==0)?'null':$elem[$key]*1);
+            $rowsSql[] = str_replace('""', "NULL", '('.implode(', ', $fieldsForInsert).')');
+            $count++;
+        }
+        if ($count) {
+            $DB->exec($headSql . implode(", ", $rowsSql));
+            $this->timeInsert = round(microtime(true)-$start, 2);
+            echo "  import $this->table: ".$count." en ".$this->timeInsert."s<br>\n";
+        }
+        // Fetch data !!
+        $this->fetchDataDB();
+    }
+    public function fetchDataDB() {
+        global $DB;
+        $res = $DB->query("SELECT * FROM $this->table");
+        $this->list = [];
+        foreach ($res as $val) {
+            $this->list[$val['pk']] = $this->mapValue($val);
+        }
+    }
+    public function mapValue($elem) {
+        foreach ($this->DB_fields_mapping as $key => $type)
+            $elem[$key] = ($type == 'int') ? $elem[$key]*1 : $elem[$key];
+        return $elem;
+    }
     public function parseData($elem) {
         $this->list[] = $elem;
+    }
+    public function parseDateForInsert($elem) {
+        return $elem;
+    }
+    public function log($msg){
+        file_put_contents($this->CurGtfsCtrl->log_path.'log_analyse.csv', date("Y-m-d H:i:s").': '.$msg."\n", FILE_APPEND);
     }
     public static function hourMinToSec($hourMin) {
         $hourMin = explode(':', $hourMin);

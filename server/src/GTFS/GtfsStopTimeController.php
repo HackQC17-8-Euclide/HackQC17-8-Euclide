@@ -46,10 +46,14 @@ class GtfsStopTimeController extends GtfsElemController {
         if ($trip['departure_sec'] > $stopTime['arrival_sec']) {
             $trip['departure_sec'] = $stopTime['arrival_sec'];
             $trip['departure_time'] = $stopTime['departure_time'];
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_sec'] = $stopTime['arrival_sec'];
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_time'] = $stopTime['departure_time'];
         }
         if ($trip['arrival_sec'] < $stopTime['departure_sec']) {
             $trip['arrival_sec'] = $stopTime['departure_sec'];
             $trip['arrival_time'] = $stopTime['departure_time'];
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['arrival_sec'] = $stopTime['departure_sec'];
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['arrival_time'] = $stopTime['departure_time'];
         }
     }
 }

@@ -29,18 +29,18 @@ class DB{
         }
     }
 
-    public function query($sql, $data = array(),$fetch = PDO::FETCH_ASSOC){
-        try{
+    public function query($sql, $data = array(),$fetch = PDO::FETCH_ASSOC) {
+        try {
             $req = $this->db->prepare($sql);
             $req->execute($data);
-            if(!preg_match('/^(SET|INSERT|UPDATE|DELETE|TRUNCATE|DROP|CREATE)/', $sql)){
+            if (!preg_match('/^(SET|INSERT|UPDATE|DELETE|TRUNCATE|DROP|CREATE)/', $sql)) {
                 if (!empty($fetch))
                     return $req->fetchAll($fetch);
                 else
                     return $req->fetchAll();
-            }else
+            } else
                 return $this->db->lastInsertId();
-        }catch(PDOException $e){
+        } catch(PDOException $e) {
             die('<h3>Erreur : </h3><p>'.$e->getMessage().'</p>');
         }
     }
