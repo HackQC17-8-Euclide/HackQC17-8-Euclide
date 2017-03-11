@@ -1,13 +1,17 @@
 import {Stop_time} from'./Stops_times'
+import {Pos} from './pos_bus'
 
 export class Stop{
   id:number;
+  pos:Pos;
   lat:number;
   long:number;
   times:Stop_time[]= new Array <Stop_time>();
 
   constructor(id:number,lat:number,long:number){
     this.id=id;
+    this.pos.lat=lat;
+    this.pos.long=long;
     this.lat=lat;
     this.long=long;
   }
