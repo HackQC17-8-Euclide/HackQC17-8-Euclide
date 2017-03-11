@@ -1,4 +1,5 @@
-<div class="map">
+<div id = "mapId">
+    
 </div>
 
 <div class="footer">
@@ -10,18 +11,19 @@
         </div>
         <div class="col-sm-6">
             <div class="speedometer">
-                <div>
+                
                     <label for="fader"> Minutes </label>
-                </div>
-                <div>
+                
+                
                     <input type="range" min="0" max="60" value="0" id="fader" step="5" (input)="updateOutput($event , output)">
-                </div>
-                <div>
+                
+                
                     <output for="fader" #output>0 min</output>
-                </div>
+                
             </div>
         </div>
     </div>
 
 
 </div>
+

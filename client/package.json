@@ -26,6 +26,7 @@
     "glyphicons": "^0.2.0",
     "jquery": "^3.1.1",
     "leaflet": "^1.0.3",
+    "leaflet-draw": "^0.4.9",
     "rxjs": "^5.0.1",
     "tether": "^1.4.0",
     "ts-helpers": "^1.1.1",

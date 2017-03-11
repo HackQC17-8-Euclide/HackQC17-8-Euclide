@@ -1,5 +1,4 @@
 
-
 span {
     font-size: 22px
 }
@@ -16,6 +15,14 @@ span {
     text-align: center;
 }
 
+#mapId {
+    position:absolute;
+    top: 40px;
+    bottom: 40px;
+    right: 0px;
+    left: 0px;
+    width: 100%;
+}
 
 input[type=range],
 	::-moz-range-track,
@@ -25,6 +32,7 @@ input[type=range],
      width : 50%;
      height : 2px;
 }
+
 
 .footer {
      bottom: 0;
