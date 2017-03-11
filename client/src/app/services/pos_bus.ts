@@ -1,18 +1,31 @@
 import { Stops } from './Stops'
 import { Stops_times } from './Stops_times'
 
-export class pos {
+export class Pos {
     lat: number;
     long: number;
+}
+
+export class trip{
+    pred:trip;
+    succ:trip;
+    id: "58c3782d73f81c56719891b8";
+    trip_id: 4;
+    arr: 6636;
+    dep: 12872;
+    stop_id: 4;
+    stop_sequence: 8;
+    is_terminus: true;
+    is_head: true;
 }
 
 
 export class pos_bus {
 
-    public get_pos_bus(temps_actuel): pos[] {
+    public get_pos_bus(temps_actuel): Pos[] {
         let Hash_pred = [];
         for (var stop_time of Stops_times.stops_times) {
-            if (stop_time['arr'] < temps_actuel && Hash_pred[stop_time['trip_id']]['arr'] == null)
+            if (stop_time['arr'] < temps_actuel && Hash_pred[stop_time['trip_id']] == null)
                 Hash_pred[stop_time['trip_id']] = stop_time;
             else if (stop_time['arr'] < temps_actuel && stop_time['arr'] > Hash_pred[stop_time['trip_id']]['arr'])
                 Hash_pred[stop_time['trip_id']] = stop_time;
@@ -22,7 +35,7 @@ export class pos_bus {
             if (stop_time['stop_sequence'] == Hash_pred[stop_time['trip_id']]['stop_sequence'] + 1)
                 Hash_next[stop_time['trip_id']] = stop_time;
         }
-        let positions = new Array<pos>();
+        let positions = new Array<Pos>();
         for (var stop of Hash_pred) {
             var lat1 = stop['lat'];
             var long1 = stop['long'];

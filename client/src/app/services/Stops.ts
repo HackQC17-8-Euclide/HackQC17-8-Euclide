@@ -1,54 +1,77 @@
+export class Stop{
+  id:number;
+  lat:number;
+  long:number;
+
+  constructor(id:number,lat:number,long:number){
+    this.id=id;
+    this.lat=lat;
+    this.long=long;
+  }
+
+}
+
+
 export class Stops{
-    static stops=[
+  static formatted_stops:Stop[];
+  static stops=[
   {
-    "_id": "58c37468ddfaca8d3447417d",
+    "_id": 1,
     "lat": 82.704318,
     "long": 32.656626
   },
   {
-    "_id": "58c37468c1fb10a2afe276a6",
+    "_id": 2,
     "lat": -83.993829,
     "long": 42.122138
   },
   {
-    "_id": "58c37468368faf32a3e26252",
+    "_id": 3,
     "lat": 80.156553,
     "long": -55.482735
   },
   {
-    "_id": "58c37468b4bd4a367c33ceec",
+    "_id":4,
     "lat": 10.262653,
     "long": -23.911256
   },
   {
-    "_id": "58c37468fc2cd5f45da0de7e",
+    "_id": 5,
     "lat": -84.136272,
     "long": -119.920749
   },
   {
-    "_id": "58c37468b77d27b292329005",
+    "_id": 6,
     "lat": 10.072686,
     "long": -147.72684
   },
   {
-    "_id": "58c374680042b40a2f595aa7",
+    "_id": 7,
     "lat": -39.892698,
     "long": -21.803235
   },
   {
-    "_id": "58c37468ae2c2bdf1f7e60ad",
+    "_id": 8,
     "lat": 70.833773,
     "long": 18.279918
   },
   {
-    "_id": "58c374682d403c03f108fb5d",
+    "_id": 9,
     "lat": 25.223348,
     "long": -15.008411
   },
   {
-    "_id": "58c37468f4418debf4cd53fb",
+    "_id": 10,
     "lat": 66.275585,
     "long": -120.502812
   }
 ];
+
+
+
+compute_formatted_stops(){
+    for (var i=0;i<Stops.stops.length;i++){
+      Stops.formatted_stops[i]=new Stop(Stops.stops['_id'],Stops.stops['lat'],Stops.stops['long']);
+    }
+  }
 }
