@@ -21,9 +21,10 @@ export class AppComponent {
   constructor(){
     this.assign();
     this.pos_bus.get_pos_bus(5050);
-    this.pos.lat=23.5222;
-    this.pos.long= 0;
-    this.acces = accessibilite.accessibilites(this.pos,14400,0);
+    this.pos.lat=45.40;
+    this.pos.long= -71.95;
+    this.acces = accessibilite.accessibilites(this.pos,40000,0);
+    console.log(this.acces);
    
   }
 }

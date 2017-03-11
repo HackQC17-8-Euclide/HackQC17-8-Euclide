@@ -11,15 +11,14 @@ export class couple<X, Y>{
 
 export class accessibilite {
 
-    static accessibilites(pos: Pos, temps_en_s: number, temps_actuel_en_s: number): couple<Pos, number>[]
-    {
-        return accessibilite.accessibilite(pos,temps_en_s,temps_actuel_en_s,new Array<couple<Pos, number>>());
+    static accessibilites(pos: Pos, temps_en_s: number, temps_actuel_en_s: number): couple<Pos, number>[] {
+        return accessibilite.accessibilite(pos, temps_en_s, temps_actuel_en_s, new Array<couple<Pos, number>>());
     }
 
     static accessibilite(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
-        var vitesse_pied = 1950;
+        var vitesse_pied = 10;
         var vitesse_velo = 15;
-        console.log(acc);
+        //console.log(acc);
         //creation du tableau de résultats
         //var res = new Array<couple<Pos, number>>();
         // on ajoute le cerle de départ
@@ -27,7 +26,6 @@ export class accessibilite {
         c.arg1 = pos;
         c.arg2 = accessibilite.compute_limit_distance(vitesse_pied, temps_en_s);
         acc[acc.length] = c;
-         //console.log(acc);
         //on va chercher toutes les stations accessibles à pied 
         // on les récupère ds un tableau de couples (arrêt, distance)
         var liste_stations = new Array<couple<Stop, number>>();
@@ -42,19 +40,24 @@ export class accessibilite {
         for (var i = 0; i < liste_stations.length; i++) {
             var tab = liste_stations[i].arg1.times;
             for (var j = 0; j < tab.length; j++) {
-                if (tab[j].arr > liste_stations[i].arg2 && tab[j].arr < liste_stations[i].arg2 + temps_en_s) {
+                if (tab[j].arr > liste_stations[i].arg2 && tab[j].arr < temps_actuel_en_s + temps_en_s) {
                     times[times.length] = tab[j];
                 }
             }
         }
+        //console.log(times);
+        // console.log(times);
         //récupération de tous les stop times accessibles (sans correspondance)
+        //console.log(times);
         var acc_stop_times = new Array<Stop_time>();
-        for (var i = 0; i < times.length; j++) {
+        for (var i = 0; i < times.length; i++) {
             while (times[i].succ != null && times[i].succ.arr < temps_actuel_en_s + temps_en_s) {
                 acc_stop_times[acc_stop_times.length] = times[i].succ;
                 times[i] = times[i].succ;
+
             }
         }
+
         //ajout des sols des correspondances
         for (var stop of acc_stop_times) {
             var b = true;
@@ -68,7 +71,8 @@ export class accessibilite {
             //    acc[acc.length]=c;
             //}
         }
-      
+
+       // console.log(acc);
         return acc;
     }
 
