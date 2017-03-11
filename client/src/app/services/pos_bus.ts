@@ -5,6 +5,13 @@ import { Stop_time } from './Stops_times'
 export class Pos {
     lat: number;
     long: number;
+
+    moy(p:Pos){
+        var pos=new Pos();
+        pos.lat=1/2*(this.lat+pos.lat);
+        pos.long=1/2*(this.long+pos.long);
+        return pos;
+    }
 }
 
 export class trip {
