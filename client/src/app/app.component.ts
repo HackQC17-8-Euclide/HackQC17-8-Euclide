@@ -13,6 +13,7 @@ const DIGIT_LIMIT = 10;
 })
 
 
+
 export class AppComponent implements OnInit,AfterContentInit {
   static currentPos: any;
   private map: any;
@@ -112,5 +113,6 @@ export class AppComponent implements OnInit,AfterContentInit {
 
   getErrorFromLocation(error) {
     alert('ERROR ' + error.message);
+
   }
 }

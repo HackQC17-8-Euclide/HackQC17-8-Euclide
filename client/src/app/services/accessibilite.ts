@@ -4,27 +4,37 @@ import { Stop } from './Stops'
 import { Stop_time } from './Stops_times'
 import { Pos } from './pos_bus'
 
-class couple<X, Y>{
+export class couple<X, Y>{
     arg1: X;
     arg2: Y;
+    constructor(x: X, y: Y) {
+        this.arg1 = x;
+        this.arg2 = y;
+    }
 }
 
-export class accessibilité {
+export class accessibilite {
 
-    static accessibilité(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
-        var vitesse_pied = 5;
+    static accessibilites(pos: Pos, temps_en_s: number, temps_actuel_en_s: number): couple<Pos, number>[] {
+        return accessibilite.accessibilite(pos, temps_en_s, temps_actuel_en_s, new Array<couple<Pos, number>>());
+    }
+
+    static accessibilite(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
+        var vitesse_pied = 1950;
         var vitesse_velo = 15;
+        console.log(acc);
         //creation du tableau de résultats
         //var res = new Array<couple<Pos, number>>();
         // on ajoute le cerle de départ
-        var c = new couple<Pos, number>();
+        var c = new couple<Pos, number>(null, null);
         c.arg1 = pos;
-        c.arg2 = accessibilité.compute_limit_distance(vitesse_pied, temps_en_s);
+        c.arg2 = accessibilite.compute_limit_distance(vitesse_pied, temps_en_s);
         acc[acc.length] = c;
+        //console.log(acc);
         //on va chercher toutes les stations accessibles à pied 
         // on les récupère ds un tableau de couples (arrêt, distance)
         var liste_stations = new Array<couple<Stop, number>>();
-        liste_stations = accessibilité.compute_accessible_stops(c.arg2, pos);
+        liste_stations = accessibilite.compute_accessible_stops(c.arg2, pos);
 
         // on le transforme en un tableau de couples (arrêt, temps d'arrivée)
         for (var i = 0; i < liste_stations.length; i++) {
@@ -42,7 +52,7 @@ export class accessibilité {
         }
         //récupération de tous les stop times accessibles (sans correspondance)
         var acc_stop_times = new Array<Stop_time>();
-        for (var i = 0; i < times.length; j++) {
+        for (var i = 0; i < times.length; i++) {
             while (times[i].succ != null && times[i].succ.arr < temps_actuel_en_s + temps_en_s) {
                 acc_stop_times[acc_stop_times.length] = times[i].succ;
                 times[i] = times[i].succ;
@@ -56,11 +66,12 @@ export class accessibilité {
                     b = false;
             }
             if (b)
-                var r = accessibilité.accessibilité(stop.stop.pos, temps_en_s - (stop.arr - temps_actuel_en_s), stop.arr, acc);
+                var r = accessibilite.accessibilite(stop.stop.pos, temps_en_s - (stop.arr - temps_actuel_en_s), stop.arr, acc);
             //for (c of r){
             //    acc[acc.length]=c;
             //}
         }
+
         return acc;
     }
 
@@ -78,7 +89,7 @@ export class accessibilité {
         for (var i = 0; i < tab.length; i++) {
             var d = this.distance(tab[i].pos, ma_pos);
             if (d < limit_dist) {
-                var c = new couple<Stop, number>();
+                var c = new couple<Stop, number>(null, null);
                 c.arg1 = tab[i];
                 c.arg2 = d;
                 stop_dist[i] = c;
@@ -98,4 +109,40 @@ export class accessibilité {
         var mon_y = (ma_pos.long) * R * Math.PI * Math.cos(ma_pos.lat * Math.PI / 180) / 180;
         return Math.sqrt(Math.pow(mon_x - x, 2) + Math.pow(mon_y - y, 2));
     }
+}
+
+
+export class grille {
+    static compute_scores(max:Pos,min:Pos,heure_initiale:number,duree:number){
+        var objElement = document.createElement('object');
+        var N = 1000
+        for (var i =0;i<N;i++){
+            for(var j=0;j<=i;j++){
+                var pt=grille.point(max,min,i,j);
+               // charger données du point
+                var s =grille.score(accessibilite.accessibilites(pt,heure_initiale,duree));
+            }
+        }
+    }
+
+    static point(max: Pos, min: Pos, lat: number, long: number): Pos {
+        var pt = new Pos();
+        pt.lat= grille.num(max.lat,min.lat,lat);
+        pt.long= grille.num(max.long,min.long,long);
+        return pt;
+    }
+
+    static num(max:number,min:number,l:number):number{
+        var n=Math.floor(Math.log(l)/Math.LN2);
+        return (min+(max-min)*(l-Math.pow(2,n))/(Math.pow(2,n+1)));
+    }
+
+    static score(acc:couple<Pos, number>[]):number{
+        var res = 0;
+        for (var c of acc){
+            res+=c.arg2*c.arg2;
+        }
+        return res;
+    }
+
 }
