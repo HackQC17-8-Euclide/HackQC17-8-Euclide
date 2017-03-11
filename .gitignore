@@ -1,7 +1,8 @@
 /server/vendor/
-/server/logs/*
+/server/logs/
 !/server/logs/README.md
-/server/intput/*
+/server/intput/
 !/server/intput/README.md
 /server/conf.php
 /server/composer.lock
+server/input/
