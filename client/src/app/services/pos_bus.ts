@@ -55,7 +55,7 @@ export class pos_bus {
             }
         }
 
-        console.log(positions);
+       // console.log(positions);
          return positions;
        
         }

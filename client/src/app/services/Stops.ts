@@ -10,6 +10,7 @@ export class Stop{
 
   constructor(id:number,lat:number,long:number){
     this.id=id;
+    this.pos = new Pos();
     this.pos.lat=lat;
     this.pos.long=long;
     this.lat=lat;
