@@ -26,138 +26,148 @@ export class Stop_time {
     this.is_head = is_head;
     this.pred=null;
     this.succ=null;
+    this.stop =null;
   }
 
 }
 
 export class Stops_times {
-  static formatted_stop_times: Stop_time[];
+  static formatted_stop_times: Stop_time[]=new Array<Stop_time>();
+
 
   static compute_formatted_stop_times() {
     for (var i = 0; i < Stops_times.stops_times.length; i++) {
       var a = Stops_times.stops_times[i];
       Stops_times.formatted_stop_times[i] = new Stop_time(a._id, a.trip_id, a.arr, a.dep, a.stop_id, a.stop_sequence, a.is_terminus, a.is_head);
+    }
+    for (var i = 0; i < Stops_times.stops_times.length; i++) {
       for (var j=0;j<Stops.formatted_stops.length;j++){
-        if (Stops.formatted_stops[j].id==a._id){
+        if (Stops.formatted_stops[j].id==Stops_times.stops_times[i].stop_id){
            Stops_times.formatted_stop_times[i].stop = Stops.formatted_stops[j];
            Stops.formatted_stops[j].times[Stops.formatted_stops[j].times.length]=Stops_times.formatted_stop_times[i];
         }
+        //  console.log (Stops.formatted_stops[j].id);
+        //   console.log (Stops_times.stops_times[i].stop_id);
       }
+     
     }
+
+    Stops_times.build_trips();
   }
+  
 
   static build_trips() {
         for (var i = 0; i < Stops_times.formatted_stop_times.length; i++) {
             for (var j = i; j < Stops_times.formatted_stop_times.length; j++) {
                 if (Stops_times.formatted_stop_times[i].trip_id==Stops_times.formatted_stop_times[j].trip_id){
                     if (Stops_times.formatted_stop_times[i].stop_sequence==Stops_times.formatted_stop_times[j].stop_sequence+1){
-                        Stops_times.formatted_stop_times[i].succ=Stops_times.formatted_stop_times[j];
-                        Stops_times.formatted_stop_times[j].pred=Stops_times.formatted_stop_times[i];
+                        Stops_times.formatted_stop_times[i].pred=Stops_times.formatted_stop_times[j];
+                        Stops_times.formatted_stop_times[j].succ=Stops_times.formatted_stop_times[i];
                     }
                     if (Stops_times.formatted_stop_times[j].stop_sequence==Stops_times.formatted_stop_times[i].stop_sequence+1){
-                        Stops_times.formatted_stop_times[j].succ=Stops_times.formatted_stop_times[i];
-                        Stops_times.formatted_stop_times[i].pred=Stops_times.formatted_stop_times[j];
+                        Stops_times.formatted_stop_times[j].pred=Stops_times.formatted_stop_times[i];
+                        Stops_times.formatted_stop_times[i].succ  =Stops_times.formatted_stop_times[j];
                     }
                 }
             }
         }
     }
 
-  static stops_times = [
+  private static stops_times = [
     {
       "_id": 1,
-      "trip_id": 4,
+      "trip_id": 1,
       "arr": 6636,
-      "dep": 12872,
-      "stop_id": 4,
-      "stop_sequence": 8,
+      "dep": 6636,
+      "stop_id": 6,
+      "stop_sequence": 6,
       "is_terminus": true,
       "is_head": true
     },
     {
       "_id": 2,
-      "trip_id": 9,
+      "trip_id":1,
       "arr": 4933,
-      "dep": 5325,
-      "stop_id": 2,
-      "stop_sequence": 10,
+      "dep": 4933,
+      "stop_id": 4,
+      "stop_sequence": 4,
       "is_terminus": true,
       "is_head": false
     },
     {
       "_id": 3,
-      "trip_id": 18,
+      "trip_id": 1,
       "arr": 2902,
-      "dep": 6412,
-      "stop_id": 5,
-      "stop_sequence": 4,
+      "dep": 2902,
+      "stop_id": 2,
+      "stop_sequence": 2,
       "is_terminus": true,
       "is_head": true
     },
     {
       "_id": 4,
-      "trip_id": 6,
+      "trip_id": 1,
       "arr": 4665,
-      "dep": 14119,
-      "stop_id": 4,
-      "stop_sequence": 5,
+      "dep": 4665,
+      "stop_id": 3,
+      "stop_sequence": 3,
       "is_terminus": false,
       "is_head": false
     },
     {
       "_id": 5,
-      "trip_id": 6,
+      "trip_id": 1,
       "arr": 6974,
-      "dep": 2151,
-      "stop_id": 8,
-      "stop_sequence": 9,
+      "dep": 6974,
+      "stop_id": 7,
+      "stop_sequence": 7,
       "is_terminus": true,
       "is_head": true
     },
     {
       "_id": 6,
-      "trip_id": 19,
+      "trip_id": 1,
       "arr": 5716,
-      "dep": 10472,
-      "stop_id": 7,
-      "stop_sequence": 3,
+      "dep": 5716,
+      "stop_id": 5,
+      "stop_sequence": 5,
       "is_terminus": true,
       "is_head": false
     },
     {
       "_id": 7,
-      "trip_id": 5,
+      "trip_id": 1,
       "arr": 2892,
-      "dep": 338,
-      "stop_id": 8,
+      "dep": 2892,
+      "stop_id": 1,
       "stop_sequence": 1,
       "is_terminus": true,
       "is_head": false
     },
     {
       "_id": 8,
-      "trip_id": 19,
+      "trip_id": 1,
       "arr": 9026,
-      "dep": 3647,
+      "dep": 9026,
       "stop_id": 8,
-      "stop_sequence": 3,
+      "stop_sequence": 8,
       "is_terminus": false,
       "is_head": true
     },
     {
       "_id": 9,
-      "trip_id": 11,
+      "trip_id": 1,
       "arr": 13219,
-      "dep": 13159,
-      "stop_id": 8,
-      "stop_sequence": 10,
+      "dep": 13219,
+      "stop_id": 9,
+      "stop_sequence": 9,
       "is_terminus": true,
       "is_head": false
     },
     {
       "_id": 10,
       "trip_id": 10,
-      "arr": 320,
+      "arr": 3792,
       "dep": 3792,
       "stop_id": 1,
       "stop_sequence": 8,
@@ -179,7 +189,7 @@ export class Stops_times {
       "trip_id": 13,
       "arr": 7108,
       "dep": 6280,
-      "stop_id": 10,
+      "stop_id": 5,
       "stop_sequence": 4,
       "is_terminus": true,
       "is_head": false
@@ -189,7 +199,7 @@ export class Stops_times {
       "trip_id": 14,
       "arr": 7296,
       "dep": 7456,
-      "stop_id": 7,
+      "stop_id": 3,
       "stop_sequence": 9,
       "is_terminus": true,
       "is_head": false
@@ -586,4 +596,3 @@ export class Stops_times {
     }
   ];
 }
-

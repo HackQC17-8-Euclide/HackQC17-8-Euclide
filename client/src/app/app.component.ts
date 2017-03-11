@@ -15,6 +15,6 @@ export class AppComponent {
   }
   constructor(){
     this.assign();
-    this.pos_bus.get_pos_bus(1);
+    this.pos_bus.get_pos_bus(5050);
   }
 }
