@@ -1,3 +1,6 @@
+import {Stop} from './Stops'
+import {Stops} from './Stops'
+
 export class Stop_time {
   id: number;
   trip_id: number;
@@ -9,6 +12,7 @@ export class Stop_time {
   is_head: boolean;
   pred: Stop_time;
   succ: Stop_time;
+  stop: Stop;
 
 
   constructor(id, trip_id, arr, dep, stop_id, stop_sequence, is_terminus, is_head) {
@@ -33,6 +37,12 @@ export class Stops_times {
     for (var i = 0; i < Stops_times.stops_times.length; i++) {
       var a = Stops_times.stops_times[i];
       Stops_times.formatted_stop_times[i] = new Stop_time(a._id, a.trip_id, a.arr, a.dep, a.stop_id, a.stop_sequence, a.is_terminus, a.is_head);
+      for (var j=0;j<Stops.formatted_stops.length;j++){
+        if (Stops.formatted_stops[j].id==a._id){
+           Stops_times.formatted_stop_times[i].stop = Stops.formatted_stops[j];
+           Stops.formatted_stops[j].times[Stops.formatted_stops[j].times.length]=Stops_times.formatted_stop_times[i];
+        }
+      }
     }
   }
 

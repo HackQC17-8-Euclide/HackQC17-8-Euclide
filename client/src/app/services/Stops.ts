@@ -1,7 +1,10 @@
+import {Stop_time} from'./Stops_times'
+
 export class Stop{
   id:number;
   lat:number;
   long:number;
+  times:Stop_time[];
 
   constructor(id:number,lat:number,long:number){
     this.id=id;

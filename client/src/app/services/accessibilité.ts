@@ -2,6 +2,11 @@ import { Stops } from './Stops'
 import { Stops_times } from './Stops_times'
 import { Pos } from './pos_bus'
 
+class couple<X,Y>{
+    arg1:X;
+    arg2:Y;
+}
+
 export class accessibilité{
     ma_pos: Pos;
     stop_dist:number[];
@@ -16,17 +21,23 @@ export class accessibilité{
         return vit_km_h*time_sec/3600;
     }
 
-    compute_accessible_stops(limit_dist:number):void{
+    static compute_accessible_stops(limit_dist:number, lat:number, long:number):couple<number[],boolean[]>{
         //calcule pour chaque arrêt s'il est atteingnable à pied et sa distance à l'utilisateur
-        var tab = Stops.stops;
+        var tab = Stops.formatted_stops;
         for (var i=0;i<tab.length;i++){
             var d = this.distance(tab[i].lat,tab[i].long);
-            Stops_times[tab[i]._id]=d;
-            this.accessible_stop[tab[i]._id]=d<limit_dist;
+            var stop_dist:number[];
+            var accessible_stop:boolean[];
+            stop_dist[tab[i].id]=d;
+            accessible_stop[tab[i].id]=d<limit_dist;
         }  
+        var c = new couple();
+        c.arg1=stop_dist;
+        c.arg2=accessible_stop;
+        return c;
     }
 
-    distance(lat:number, long:number):number{
+    static distance(lat:number, long:number):number{
         //calcule la distance entre une stations et ma position
         //retourne le résultat en km
         var R = 6378;
