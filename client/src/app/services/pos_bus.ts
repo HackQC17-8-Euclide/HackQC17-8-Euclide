@@ -29,18 +29,19 @@ export class pos_bus {
         Stops_times.compute_formatted_stop_times();
         let Hash_pred = new Array<Stop_time>();
         let Hash_next = new Array<Stop_time>();
+        //calcul du dernier arrêt du bus
         for (var stop_time of Stops_times.formatted_stop_times) {
             if (stop_time.arr < temps_actuel && Hash_pred[stop_time.trip_id] == null)
                 Hash_pred[stop_time.trip_id] = stop_time;
             else if (stop_time.arr < temps_actuel && stop_time.arr > Hash_pred[stop_time.trip_id].arr)
                 Hash_pred[stop_time.trip_id] = stop_time;
         }
-
+        //calcul de la position des bus
         let positions = new Array<Pos>();
         for (var stop_ref of Hash_pred) {
 
-           //  console.log (stop_ref);
-            if (stop_ref !== undefined && stop_ref.succ !== undefined  && stop_ref.succ !==null) {
+            //  console.log (stop_ref);
+            if (stop_ref !== undefined && stop_ref.succ !== undefined && stop_ref.succ !== null) {
                 var lat1 = stop_ref.stop.lat;
                 var long1 = stop_ref.stop.long;
                 var lat2 = stop_ref.succ.stop.lat;
@@ -49,14 +50,11 @@ export class pos_bus {
                 positions[stop_ref.trip_id] = new Pos();
                 positions[stop_ref.trip_id].lat = lat1 * (1 - b) + lat2 * (b);
                 positions[stop_ref.trip_id].long = long1 * (1 - b) + long2 * (b);
-                //  console.log (stop_ref.stop);
-                // console.log (stop_ref);
-                // console.log (stop_ref.succ);
             }
         }
 
-       // console.log(positions);
-         return positions;
-       
-        }
+        console.log(positions);
+        return positions;
+
+    }
 }
