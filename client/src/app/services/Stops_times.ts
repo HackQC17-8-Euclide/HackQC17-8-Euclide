@@ -1,4 +1,5 @@
-[
+export class Stops_times{
+  static stops_times = [
   {
     "_id": "58c3782d73f81c56719891b8",
     "trip_id": 4,
@@ -999,4 +1000,6 @@
     "is_terminus": false,
     "is_head": true
   }
-]
+];
+}
+
