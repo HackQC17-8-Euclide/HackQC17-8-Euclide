@@ -1,0 +1,18 @@
+{
+    "name": "HackQC17-8-Euclide/HackQC17-8-Euclide",
+    "description": "Projet d'analyse d'accesibilité des villes en se basant sur leurs différentes offres de transport (GTFS, bikeshare...)",
+    "keywords": ["PolyMtl", "HackQC17"],
+    "type": "project",
+    "authors": [
+        {
+            "name": "HackQC17-8-Euclide"
+        }
+    ],
+    "autoload": {
+        "classmap": [],
+        "psr-4": { "": "src/" }
+    },
+    "require": {
+        "php": ">=5.6.0"
+    }
+}
