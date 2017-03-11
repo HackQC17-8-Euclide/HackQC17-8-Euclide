@@ -4,27 +4,34 @@ import { Stop } from './Stops'
 import { Stop_time } from './Stops_times'
 import { Pos } from './pos_bus'
 
-class couple<X, Y>{
+export class couple<X, Y>{
     arg1: X;
     arg2: Y;
 }
 
-export class accessibilité {
+export class accessibilite {
 
-    static accessibilité(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
-        var vitesse_pied = 5;
+    static accessibilites(pos: Pos, temps_en_s: number, temps_actuel_en_s: number): couple<Pos, number>[]
+    {
+        return accessibilite.accessibilite(pos,temps_en_s,temps_actuel_en_s,new Array<couple<Pos, number>>());
+    }
+
+    static accessibilite(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
+        var vitesse_pied = 1950;
         var vitesse_velo = 15;
+        console.log(acc);
         //creation du tableau de résultats
         //var res = new Array<couple<Pos, number>>();
         // on ajoute le cerle de départ
         var c = new couple<Pos, number>();
         c.arg1 = pos;
-        c.arg2 = accessibilité.compute_limit_distance(vitesse_pied, temps_en_s);
+        c.arg2 = accessibilite.compute_limit_distance(vitesse_pied, temps_en_s);
         acc[acc.length] = c;
+         //console.log(acc);
         //on va chercher toutes les stations accessibles à pied 
         // on les récupère ds un tableau de couples (arrêt, distance)
         var liste_stations = new Array<couple<Stop, number>>();
-        liste_stations = accessibilité.compute_accessible_stops(c.arg2, pos);
+        liste_stations = accessibilite.compute_accessible_stops(c.arg2, pos);
 
         // on le transforme en un tableau de couples (arrêt, temps d'arrivée)
         for (var i = 0; i < liste_stations.length; i++) {
@@ -56,11 +63,12 @@ export class accessibilité {
                     b = false;
             }
             if (b)
-                var r = accessibilité.accessibilité(stop.stop.pos, temps_en_s - (stop.arr - temps_actuel_en_s), stop.arr, acc);
+                var r = accessibilite.accessibilite(stop.stop.pos, temps_en_s - (stop.arr - temps_actuel_en_s), stop.arr, acc);
             //for (c of r){
             //    acc[acc.length]=c;
             //}
         }
+      
         return acc;
     }
 
