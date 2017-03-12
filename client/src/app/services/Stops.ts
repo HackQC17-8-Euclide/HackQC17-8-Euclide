@@ -278,7 +278,7 @@ export class Stops{
  {"id":10354,"long":-72.66543831,"lat":46.62149776},
  {"id":10355,"long":-72.66543831,"lat":46.62149776},
  {"id":10356,"long":-72.70964825,"lat":46.60252912},
- {"id":10357,"long":-72.74870153,"lat":46.554105}]
+ {"id":10357,"long":-72.74870153,"lat":46.554105}];
 
 static compute_formatted_stops(){
   console.log(Stops.stops.length);

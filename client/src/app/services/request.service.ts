@@ -12,7 +12,7 @@ export class RequestService {
     constructor(private http: Http) {
     }
 
-    public getStops(): Promise<Object> {
+    public getStops(): Promise<Array<any>> {
         return this.http.get('http://' + this.ip + '/8_euclide/fetch_cur_pos_stop.php?' +
         'api_key=JesusVousAime<3!&cur_datetime=2017-03-12 20:42&lng=-73.123&lat=45.564')
             .toPromise()
@@ -23,7 +23,7 @@ export class RequestService {
             .catch(this.handleError);
     }
 
-    public getStopTimes(): Promise<Object> {
+    public getStopTimes(): Promise<Array<any>> {
         return this.http.get('http://' + this.ip + '/8_euclide/fetch_cur_pos_stop_times.php?' +
         'api_key=JesusVousAime<3!&cur_datetime=2017-03-12 20:42&lng=-73.123&lat=45.564')
             .toPromise()
