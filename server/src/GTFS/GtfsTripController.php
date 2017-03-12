@@ -3,7 +3,7 @@
 namespace HackQC17_8_Euclide\GFTS;
 
 class GtfsTripController extends GtfsElemController {
-    function __construct($path, $CurGtfsCtrl) {
+    function __construct($path, $CurGtfsCtrl, $options=[]) {
         global $DB;
         $this->table = 'gtfs_trip';
         $this->DB_fields_mapping = [
@@ -21,7 +21,7 @@ class GtfsTripController extends GtfsElemController {
             'departure_sec' => 'int',
             'arrival_sec' => 'int',
         ];
-        parent::__construct($path, $CurGtfsCtrl);
+        parent::__construct($path, $CurGtfsCtrl, $options);
         $this->primaryFieldKeyList = 'trip_id';
     }
 

@@ -113,6 +113,7 @@ export class accessibilite {
 
 
 export class grille {
+    //requête d'initialisation
     static compute_scores(max:Pos,min:Pos,heure_initiale:number,duree:number){
         var N = 1000
         for (var i =0;i<N;i++){
@@ -120,10 +121,9 @@ export class grille {
                 var pt=grille.point(max,min,i,j);
                // charger données du point
                 var s =grille.score(accessibilite.accessibilites(pt,heure_initiale,duree));
+                //requête avec même code
             }
-        }
-        var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
-        MSFileSaver.saveAs(blob, "hello world.txt");
+        }        
     }
 
     static point(max: Pos, min: Pos, lat: number, long: number): Pos {

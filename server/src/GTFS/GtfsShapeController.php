@@ -3,7 +3,7 @@
 namespace HackQC17_8_Euclide\GFTS;
 
 class GtfsShapeController extends GtfsElemController {
-    function __construct($path, $CurGtfsCtrl) {
+    function __construct($path, $CurGtfsCtrl, $options=[]) {
         global $DB;
         $this->table = 'gtfs_shape';
         $this->DB_fields_mapping = [
@@ -11,7 +11,7 @@ class GtfsShapeController extends GtfsElemController {
             'agency_pk' => 'int',
             'route_pk' => 'int',
         ];
-        parent::__construct($path, $CurGtfsCtrl);
+        parent::__construct($path, $CurGtfsCtrl, $options);
         $this->primaryFieldKeyList = 'shape_id';
     }
     public function parseData($elem) {

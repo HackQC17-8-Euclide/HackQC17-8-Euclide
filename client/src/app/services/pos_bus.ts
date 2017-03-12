@@ -2,38 +2,25 @@ import { Stops } from './Stops'
 import { Stops_times } from './Stops_times'
 import { Stop_time } from './Stops_times'
 
-export class Pos {
-    lat: number;
-    long: number;
+export  class Pos {
+   public lat: number;
+   public long: number;
 
-    moy(p:Pos){
-        var pos=new Pos();
-        pos.lat=1/2*(this.lat+pos.lat);
-        pos.long=1/2*(this.long+pos.long);
+    moy(p: Pos) {
+        var pos = new Pos();
+        pos.lat = 1 / 2 * (this.lat + pos.lat);
+        pos.long = 1 / 2 * (this.long + pos.long);
         return pos;
     }
-}
-
-export class trip {
-    pred: trip;
-    succ: trip;
-    id: "58c3782d73f81c56719891b8";
-    trip_id: 4;
-    arr: 6636;
-    dep: 12872;
-    stop_id: 4;
-    stop_sequence: 8;
-    is_terminus: true;
-    is_head: true;
 }
 
 
 export class pos_bus {
 
-    public get_pos_bus(temps_actuel): Pos[] {
+    public static get_pos_bus(temps_actuel:number): Pos[] {
         Stops.compute_formatted_stops();
-        //console.log(Stops.formatted_stops);
         Stops_times.compute_formatted_stop_times();
+        //console.log(Stops_times.formatted_stop_times);
         let Hash_pred = new Array<Stop_time>();
         let Hash_next = new Array<Stop_time>();
         //calcul du dernier arrêt du bus
@@ -43,12 +30,14 @@ export class pos_bus {
             else if (stop_time.arr < temps_actuel && stop_time.arr > Hash_pred[stop_time.trip_id].arr)
                 Hash_pred[stop_time.trip_id] = stop_time;
         }
+          //  console.log(Hash_pred);
+
         //calcul de la position des bus
         let positions = new Array<Pos>();
         for (var stop_ref of Hash_pred) {
 
-            //  console.log (stop_ref);
             if (stop_ref !== undefined && stop_ref.succ !== undefined && stop_ref.succ !== null) {
+                //console.log('stop_ref');
                 var lat1 = stop_ref.stop.lat;
                 var long1 = stop_ref.stop.long;
                 var lat2 = stop_ref.succ.stop.lat;
@@ -57,10 +46,9 @@ export class pos_bus {
                 positions[stop_ref.trip_id] = new Pos();
                 positions[stop_ref.trip_id].lat = lat1 * (1 - b) + lat2 * (b);
                 positions[stop_ref.trip_id].long = long1 * (1 - b) + long2 * (b);
+
             }
         }
-
-        console.log(positions);
         return positions;
 
     }

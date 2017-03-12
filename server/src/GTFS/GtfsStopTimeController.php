@@ -4,7 +4,7 @@ namespace HackQC17_8_Euclide\GFTS;
 
 class GtfsStopTimeController extends GtfsElemController {
 
-    function __construct($path, $CurGtfsCtrl) {
+    function __construct($path, $CurGtfsCtrl, $options=[]) {
         global $DB;
         $this->table = 'gtfs_stop_times';
         $this->DB_fields_mapping = [
@@ -21,7 +21,9 @@ class GtfsStopTimeController extends GtfsElemController {
             'pickup_type' => 'string',
             'agency_pk' => 'int'
         ];
-        parent::__construct($path, $CurGtfsCtrl);
+        parent::__construct($path, $CurGtfsCtrl, $options);
+        if (count($this->list) == 20 && !empty($this->options['autoExport']))
+            $this->export(false);
         $this->primaryFieldKeyList = 'trip_id';
     }
 
@@ -30,8 +32,9 @@ class GtfsStopTimeController extends GtfsElemController {
         if (!empty($this->CurGtfsCtrl->StopCtrl) && !isset($this->CurGtfsCtrl->StopCtrl->list[$elem['stop_id']]))
             throw new \Exception("Stop inconnu pour le trip ".json_encode($elem), 1);
         if (!isset($this->list[$elem['trip_id']])) {
-            if (count($this->list) == 20) {
+            if (count($this->list) == 20 && !empty($this->options['autoExport'])) {
                 $this->export(false);
+                unset($this->list);
                 $this->list = [];
             }
             $this->list[$elem['trip_id']] = [
@@ -111,12 +114,22 @@ class GtfsStopTimeController extends GtfsElemController {
         if ($trip['departure_sec'] > $stopTime['arrival_sec']) {
             $trip['departure_sec'] = $stopTime['arrival_sec'];
             $trip['departure_time'] = $stopTime['departure_time'];
-            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_sec'] = $stopTime['arrival_sec'];
-            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_time'] = $stopTime['departure_time'];
         }
         if ($trip['arrival_sec'] < $stopTime['departure_sec']) {
             $trip['arrival_sec'] = $stopTime['departure_sec'];
             $trip['arrival_time'] = $stopTime['departure_time'];
+        }
+        if (empty($this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_sec'])) {
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_sec'] = $stopTime['arrival_sec'];
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_time'] = $stopTime['departure_time'];
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['arrival_sec'] = $stopTime['departure_sec'];
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['arrival_time'] = $stopTime['departure_time'];
+        }
+        if ($this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_sec'] > $stopTime['arrival_sec']) {
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_sec'] = $stopTime['arrival_sec'];
+            $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['departure_time'] = $stopTime['departure_time'];
+        }
+        if ($this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['arrival_sec'] < $stopTime['departure_sec']) {
             $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['arrival_sec'] = $stopTime['departure_sec'];
             $this->CurGtfsCtrl->TripCtrl->list[$trip['trip_id']]['arrival_time'] = $stopTime['departure_time'];
         }

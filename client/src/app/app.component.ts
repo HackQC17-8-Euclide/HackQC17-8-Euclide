@@ -2,13 +2,16 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterCon
 import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
 import { RequestService } from './services/request.service';
-import { pos_bus } from './services/pos_bus';
-import { accessibilite } from './services/accessibilite';
+import { pos_bus, Pos } from './services/pos_bus';
+import { accessibilite, couple } from './services/accessibilite';
 import { Stops } from './services/Stops';
 import { Stops_times } from './services/Stops_times';
+import { LayerGroup } from 'leaflet';
 import * as d3 from 'd3';
 
 const DIGIT_LIMIT = 10;
+let latitu
+let longit
 
 @Component({
   selector: 'app-root',
@@ -21,31 +24,45 @@ const DIGIT_LIMIT = 10;
 export class AppComponent implements OnInit, AfterContentInit {
   private map: any;
   private timer: Observable<any>;
+  private timerBus: Observable<any>;
   private time: Date;
   private hours: string;
   private minutes: string;
   private seconds: string;
   private stream: any;
+  private positions: Array<Pos>;
+  private posi: Pos;
+  private acces: couple<Pos, number>[];
+  private buses = new L.LayerGroup([]);
+  private maps = new L.LayerGroup([]);
+  private accessi = new L.LayerGroup([]);
   private options = {
     enableHighAccuracy: true,
     timeout: 5000,
     maximumAge: 0
   };
+  tempsActuel(): number {
+    return parseInt(this.hours) * 3600 + parseInt(this.minutes) * 60 + parseInt(this.seconds);
+  }
+
+
 
   constructor(private mapService: MapService, private requestService: RequestService, private changeDetector: ChangeDetectorRef) {
     this.timer = Observable.timer(1000, 1000);
+    this.timerBus = Observable.timer(2000, 2000);
   }
 
   private handleError(error: any): Promise<any> {
     console.error('An error occurred', error); // for demo purposes only
     return Promise.reject(error.message || error);
+
   }
 
   refreshStop() {
     this.requestService.getStops()
       .then((data: any) => {
         Stops.stops = JSON.parse(data);
-         console.log(data);
+        console.log(data);
         Stops.compute_formatted_stops();
       }
 
@@ -91,6 +108,24 @@ export class AppComponent implements OnInit, AfterContentInit {
       //onComplete
       () => { this.changeDetector.markForCheck(); });
 
+
+    this.timerBus.subscribe(
+      //onNext
+      () => {
+
+        //operations
+        this.affichageBus();
+        /*this.formatTimer();*/
+        this.changeDetector.markForCheck();
+
+      }
+      ,
+      //onError
+      null
+      ,
+      //onComplete
+      () => { this.changeDetector.markForCheck(); });
+
   }
 
   ngAfterContentInit() {
@@ -100,7 +135,20 @@ export class AppComponent implements OnInit, AfterContentInit {
       })
       .then((pos: any) => {
         this.initMap(pos[0], pos[1]);
+        this.posi = pos;
+        this.AffichageAccessibilite(parseInt(document.getElementById('fader').getAttributeNode('value').value) * 60, pos);
       });
+
+  }
+  AffichageAccessibilite(tpsEnSec: number, pos: Pos) {
+    this.accessi.eachLayer((layer: any) => {
+      this.accessi.removeLayer(layer);
+    })
+    this.acces = accessibilite.accessibilites(pos, tpsEnSec, this.tempsActuel());
+    for (var i of this.acces) {
+      this.accessi.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2 * 1000));
+    }
+    this.accessi.addTo(this.map);
 
   }
   tick() {
@@ -133,6 +181,7 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   updateOutput(event: any, output: any) {
     output.value = String(event.target.value) + ' min';
+    this.AffichageAccessibilite(parseInt(output.value) * 60, this.posi);
   }
 
   initLocation() {
@@ -158,7 +207,7 @@ export class AppComponent implements OnInit, AfterContentInit {
       center: L.latLng(lat, long),
       zoom: 17,
       minZoom: 5,
-      maxZoom: 20
+      maxZoom: 20,
     });
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
       attribution:
@@ -169,27 +218,6 @@ export class AppComponent implements OnInit, AfterContentInit {
       accessToken: 'pk.eyJ1IjoiZWxjYXJpc21hIiwiYSI6ImNqMDVtY2U0ZzBtczAzMnFycThhdTJncXQifQ.T8Yr0w4eBuccD_2q7KbMGQ'
     }).addTo(this.map);
 
-
-
-    // var circleBigPointsData, arretsColorScale, arretsReseau;
-    // var position = [], points = [];
-
-    // let bigPoints = [
-    //   { id: 1, lat: 45.5293129, lng: -73.6019931, x: 300674, y: 5042688, r: 5, name: "Bixi Montréal", color: "#F10B0B" }
-    // ];
-    // // console.log("bigPoints", bigPoints);
-    // let circleBigPointsData = g_circleBigPoints.selectAll("circle.bigPoints").data(bigPoints)
-    // circleBigPointsData.enter().append("circle")
-    // circleBigPointsData.exit().remove()
-    // circleBigPointsData
-    //   .attr("class", "bigPoints")
-    //   .on("click", function (d, i) { console.log("Arret clique:", d); })
-    //   .attr("cx", function (d) { return d.x; })
-    //   .attr("cy", function (d) { return d.y; })
-    //   .attr("r", function (d) { return d.r; })
-    //   .attr("stroke", "#ccc")
-    //   .attr("stroke-width", 0.2)
-    //   .attr("fill", function (d) { return d.color; });
     this.markCurrentLocation(lat, long);
   }
   markCurrentLocation(lat: number, long: number, radius: number = 50) {
@@ -213,11 +241,34 @@ export class AppComponent implements OnInit, AfterContentInit {
       {
         color: 'red',
         fillColor: '#f03',
-        //fillOpacity: 0.5,
       }).addTo(this.map);
-
   }
 
+  affichageBus() {
+    this.positions = pos_bus.get_pos_bus(this.tempsActuel());
+    for (let i of this.positions) {
+      if (i !== undefined) {
+        latitu = i.lat
+        longit = i.long
+      }
+    }
+    let myIcon = L.icon({
+      iconUrl: '../icon_bus.png',
+      iconSize: [38, 50],
+      iconAnchor: [22, 94],
+      popupAnchor: [-3, -76],
+      shadowSize: [68, 95],
+      shadowAnchor: [22, 94]
+    })
+    this.buses.eachLayer((layer: any) => {
+      this.buses.removeLayer(layer);
+    })
+    for (var i of this.positions) {
+      if (i !== undefined)
+        this.buses.addLayer(L.marker([latitu, longit], { icon: myIcon }))
+    }
+    this.buses.addTo(this.map);
+  }
   projectPoint(x, y) {
     let point = this.map.latLngToLayerPoint(new L.LatLng(y, x));
     this.stream.point(point.x, point.y);

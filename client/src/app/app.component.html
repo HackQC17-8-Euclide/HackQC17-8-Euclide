@@ -2,9 +2,6 @@
 
 </div>
 
-
-
-
 <div class="footer">
     <div class="col-md-4  col-xs-12">
         <div class="col-sm-12 clock">
@@ -19,7 +16,7 @@
                 <label for="fader"> Minutes </label>
             </div>
             <div class="col-xs-4" style="top:35%">
-                <input class="display : inline-block" type="range" min="0" max="60" value="0" id="fader" step="5" (input)="updateOutput($event , output)">
+                <input class="display : inline-block" type="range" min="0" max="60" value="10" id="fader" step="5" (input)="updateOutput($event , output)">
             </div>
             <div class="col-xs-4">
                 <output for="fader" #output>0 min</output>

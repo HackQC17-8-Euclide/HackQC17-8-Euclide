@@ -6,7 +6,7 @@ class GtfsStopController extends GtfsElemController {
     public $spatialExtent = null;
     public $listFromCoords = [];
 
-    function __construct($path, $CurGtfsCtrl) {
+    function __construct($path, $CurGtfsCtrl, $options=[]) {
         global $DB;
         $this->table = 'gtfs_stop';
         $this->DB_fields_mapping = [
@@ -19,7 +19,7 @@ class GtfsStopController extends GtfsElemController {
             'parent_station' => 'string',
             'agency_pk' => 'int'
         ];
-        parent::__construct($path, $CurGtfsCtrl);
+        parent::__construct($path, $CurGtfsCtrl, $options);
         $this->primaryFieldKeyList = 'stop_id';
     }
 

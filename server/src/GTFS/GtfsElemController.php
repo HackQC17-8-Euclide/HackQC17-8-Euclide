@@ -5,11 +5,13 @@ namespace HackQC17_8_Euclide\GFTS;
 class GtfsElemController {
     public $CurGtfsCtrl;
     public $list;
+    public $options;
     public $timeLoad;
     public $timeInsert;
     public $table;
     public $DB_fields_mapping;
-    function __construct($path, $CurGtfsCtrl) {
+    function __construct($path, $CurGtfsCtrl, $options=[]) {
+        $this->options = $options;
         $this->timeLoad = null;
         $this->timeInsert = 0;
         $this->primaryFieldKeyList = 'pk';
@@ -46,6 +48,11 @@ class GtfsElemController {
         return $this->list;
     }
 
+    public function getFieldMapped($field, $value) {
+        $type = $this->DB_fields_mapping[$field];
+        return ($type=='string')?'"'.str_replace('"', '', $value).'"':((empty($value) && $value!==0)?'null':$value*1);
+    }
+
     public function export($fetch=true) {
         global $DB;
         $this->DB_fields_mapping;
@@ -79,9 +86,36 @@ class GtfsElemController {
         if ($fetch)
             $this->fetchDataDB();
     }
+
+    public function update($fields, $pk="pk") {
+        global $DB;
+        // Update
+        $start = microtime(true);
+        $rowsSql = []; $count = 0;
+        foreach ($this->list as $elem) {
+            $update = [];
+            foreach ($fields as $field)
+                $update[$field] = $field .'='. $this->getFieldMapped($field, $elem[$field]);
+            $update = "UPDATE $this->table SET ".implode(', ', $update)." WHERE $pk = ".$elem['pk'];
+            $rowsSql[] = str_replace('""', "NULL", $update);
+            $count++;
+            if ($count >= 1000) {
+                $DB->exec(implode("; ", $rowsSql));
+                echo "  update $this->table: ".$count." <br>\n";
+                $rowsSql = []; $count = 0;
+            }
+        }
+        if ($count) {
+            $DB->exec(implode("; ", $rowsSql));
+            echo "  update $this->table: ".$count." <br>\n";
+        }
+        $this->timeUpdate = round(microtime(true)-$start, 2);
+        echo "    en $this->timeUpdate s <br>\n";
+    }
+
     public function fetchDataDB() {
         global $DB;
-        $res = $DB->query("SELECT * FROM $this->table");
+        $res = $DB->query("SELECT * FROM $this->table WHERE agency_pk = ".$this->CurGtfsCtrl->AgencyCtrl->curAgencyPk);
         $this->list = [];
         foreach ($res as $val) {
             $this->list[$val[$this->primaryFieldKeyList]] = $this->mapValue($val);
