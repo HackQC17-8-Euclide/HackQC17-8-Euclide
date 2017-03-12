@@ -20,9 +20,9 @@ export class accessibilite {
     }
 
     static accessibilite(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
-        var vitesse_pied = 1950;
+        var vitesse_pied = 10;
         var vitesse_velo = 15;
-       // console.log(acc);
+        // console.log(acc);
         //creation du tableau de résultats
         //var res = new Array<couple<Pos, number>>();
         // on ajoute le cerle de départ
@@ -30,7 +30,6 @@ export class accessibilite {
         c.arg1 = pos;
         c.arg2 = accessibilite.compute_limit_distance(vitesse_pied, temps_en_s);
         acc[acc.length] = c;
-        console.log(acc);
         //on va chercher toutes les stations accessibles à pied 
         // on les récupère ds un tableau de couples (arrêt, distance)
         var liste_stations = new Array<couple<Stop, number>>();
@@ -113,33 +112,33 @@ export class accessibilite {
 
 
 export class grille {
-    static compute_scores(max:Pos,min:Pos,heure_initiale:number,duree:number){
+    static compute_scores(max: Pos, min: Pos, heure_initiale: number, duree: number) {
         var N = 1000
-        for (var i =0;i<N;i++){
-            for(var j=0;j<=i;j++){
-                var pt=grille.point(max,min,i,j);
-               // charger données du point
-                var s =grille.score(accessibilite.accessibilites(pt,heure_initiale,duree));
+        for (var i = 0; i < N; i++) {
+            for (var j = 0; j <= i; j++) {
+                var pt = grille.point(max, min, i, j);
+                // charger données du point
+                var s = grille.score(accessibilite.accessibilites(pt, heure_initiale, duree));
             }
         }
     }
 
     static point(max: Pos, min: Pos, lat: number, long: number): Pos {
         var pt = new Pos();
-        pt.lat= grille.num(max.lat,min.lat,lat);
-        pt.long= grille.num(max.long,min.long,long);
+        pt.lat = grille.num(max.lat, min.lat, lat);
+        pt.long = grille.num(max.long, min.long, long);
         return pt;
     }
 
-    static num(max:number,min:number,l:number):number{
-        var n=Math.floor(Math.log(l)/Math.LN2);
-        return (min+(max-min)*(l-Math.pow(2,n))/(Math.pow(2,n+1)));
+    static num(max: number, min: number, l: number): number {
+        var n = Math.floor(Math.log(l) / Math.LN2);
+        return (min + (max - min) * (l - Math.pow(2, n)) / (Math.pow(2, n + 1)));
     }
 
-    static score(acc:couple<Pos, number>[]):number{
+    static score(acc: couple<Pos, number>[]): number {
         var res = 0;
-        for (var c of acc){
-            res+=c.arg2*c.arg2;
+        for (var c of acc) {
+            res += c.arg2 * c.arg2;
         }
         return res;
     }

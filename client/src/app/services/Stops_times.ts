@@ -46,8 +46,6 @@ export class Stops_times {
            Stops_times.formatted_stop_times[i].stop = Stops.formatted_stops[j];
            Stops.formatted_stops[j].times[Stops.formatted_stops[j].times.length]=Stops_times.formatted_stop_times[i];
         }
-         // console.log (Stops.formatted_stops[j].id);
-           //console.log (Stops_times.stops_times[i].stop_id);
       }
      
     }
@@ -76,8 +74,8 @@ export class Stops_times {
   private static stops_times = [ {
       "_id": 1,
       "trip_id": 426077,
-      "arr": 27300,
-      "dep": 27540,
+      "arr": 2800,
+      "dep": 2800,
       "stop_id": 8001,
       "stop_sequence": 1,
       "is_terminus": true,
@@ -86,8 +84,10 @@ export class Stops_times {
 {
       "_id": 2,
       "trip_id": 426077,
-      "arr": 27585,
-      "dep": 27585,
+     /* "arr": 27585,
+      "dep": 27585,*/
+       "arr": 3200,
+      "dep": 3200,
       "stop_id": 387,
       "stop_sequence": 2,
       "is_terminus": true,
@@ -96,8 +96,10 @@ export class Stops_times {
 {
       "_id": 3,
       "trip_id": 426077,
-      "arr": 27620,
-      "dep": 27620,
+     /* "arr": 27620,
+      "dep": 27620,*/
+       "arr": 3900,
+      "dep": 3900,
       "stop_id": 388,
       "stop_sequence": 3,
       "is_terminus": true,
@@ -106,8 +108,10 @@ export class Stops_times {
 {
       "_id": 4,
       "trip_id": 426077,
-      "arr": 27660,
-      "dep": 27660,
+     /* "arr": 27660,
+      "dep": 27660,*/
+       "arr": 4500,
+      "dep": 4500,
       "stop_id": 389,
       "stop_sequence": 4,
       "is_terminus": true,
@@ -116,8 +120,10 @@ export class Stops_times {
 {
       "_id": 5,
       "trip_id": 426077,
-      "arr": 27684,
-      "dep": 27684,
+      /*"arr": 276840,
+      "dep": 276840,*/
+       "arr": 5000,
+      "dep": 5000,
       "stop_id": 390,
       "stop_sequence": 5,
       "is_terminus": true,
