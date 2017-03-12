@@ -3,7 +3,7 @@
 namespace HackQC17_8_Euclide\GFTS;
 
 class GtfsAgencyController extends GtfsElemController {
-    function __construct($path, $CurGtfsCtrl) {
+    function __construct($path, $CurGtfsCtrl, $options=[]) {
         global $DB;
         $this->table = 'gtfs_agency';
         $this->DB_fields_mapping = [
@@ -20,7 +20,7 @@ class GtfsAgencyController extends GtfsElemController {
             'lat_min' => 'int',
             'lat_max' => 'int'
         ];
-    	parent::__construct($path, $CurGtfsCtrl);
+    	parent::__construct($path, $CurGtfsCtrl, $options);
     	if ($this->count == 0)
     		throw new \Exception("No agency found !!", 1);
     	if ($this->count != 1)

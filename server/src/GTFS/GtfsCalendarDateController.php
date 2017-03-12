@@ -5,7 +5,7 @@ namespace HackQC17_8_Euclide\GFTS;
 class GtfsCalendarDateController extends GtfsElemController {
     public $listServiceId = [];
 
-    function __construct($path, $CurGtfsCtrl) {
+    function __construct($path, $CurGtfsCtrl, $options=[]) {
         $this->table = 'gtfs_calendar_dates';
         $this->DB_fields_mapping = [
             'service_id' => 'string',
@@ -13,7 +13,7 @@ class GtfsCalendarDateController extends GtfsElemController {
             'exception_type' => 'int',
             'agency_pk' => 'int'
         ];
-        parent::__construct($path, $CurGtfsCtrl);
+        parent::__construct($path, $CurGtfsCtrl, $options);
         $this->primaryFieldKeyList = 'service_id';
         foreach ($this->list as $service_id => $service) {
             if (!empty($this->CurGtfsCtrl->CalendarCtrl) && !isset($this->CurGtfsCtrl->CalendarCtrl->list[$service['service_id']])) {}

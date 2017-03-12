@@ -3,7 +3,7 @@
 namespace HackQC17_8_Euclide\GFTS;
 
 class GtfsCalendarController extends GtfsElemController {
-    function __construct($path, $CurGtfsCtrl) {
+    function __construct($path, $CurGtfsCtrl, $options=[]) {
         global $DB;
         $this->table = 'gtfs_calendar';
         $this->DB_fields_mapping = [
@@ -19,7 +19,7 @@ class GtfsCalendarController extends GtfsElemController {
             'end_date' => 'string',
             'agency_pk' => 'int'
         ];
-        parent::__construct($path, $CurGtfsCtrl);
+        parent::__construct($path, $CurGtfsCtrl, $options);
         $this->primaryFieldKeyList = 'service_id';
     }
 
