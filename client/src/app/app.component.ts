@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterContentInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
+import { pos_bus } from './services/pos_bus'
+import { accessibilite } from './services/accessibilite'
 import * as d3 from 'd3';
 
 const DIGIT_LIMIT = 10;
@@ -23,6 +25,7 @@ export class AppComponent implements OnInit, AfterContentInit {
   private minutes: string;
   private seconds: string;
   private stream: any;
+  
   private options = {
     enableHighAccuracy: true,
     timeout: 5000,
@@ -119,7 +122,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     this.map = L.map('mapId', {
       zoomControl: false,
       center: L.latLng(lat, long),
-      zoom: 12,
+      zoom: 17,
       minZoom: 5,
       maxZoom: 20
     });
@@ -127,7 +130,7 @@ export class AppComponent implements OnInit, AfterContentInit {
       attribution:
       'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,' +
       '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-      maxZoom: 18,
+      maxZoom: 20,
       id: 'digitalglobe.nako6329',
       accessToken: 'pk.eyJ1IjoiZWxjYXJpc21hIiwiYSI6ImNqMDVtY2U0ZzBtczAzMnFycThhdTJncXQifQ.T8Yr0w4eBuccD_2q7KbMGQ'
     }).addTo(this.map);
@@ -155,7 +158,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     //   .attr("fill", function (d) { return d.color; });
     this.markCurrentLocation(lat, long);
   }
-  markCurrentLocation(lat: number, long: number) {
+  markCurrentLocation(lat: number, long: number,radius:number=50) {
 
     // let svg = d3.select(this.map.getPanes().overlayPane).append("svg"),
     //   g = svg.append("g").attr("class", "leaflet-zoom-hide");
@@ -172,12 +175,12 @@ export class AppComponent implements OnInit, AfterContentInit {
     //   .attr("r", "15")
     //   .attr("fill", "green")
     let marker = L.marker([lat, long]).addTo(this.map);
-    var circle = L.circle([lat, long],100,
-    {
-    color: 'red',
-    fillColor: '#f03',
-    //fillOpacity: 0.5,
-  }).addTo(this.map);
+    var circle = L.circle([lat, long], radius,
+      {
+        color: 'red',
+        fillColor: '#f03',
+        //fillOpacity: 0.5,
+      }).addTo(this.map);
 
   }
 
