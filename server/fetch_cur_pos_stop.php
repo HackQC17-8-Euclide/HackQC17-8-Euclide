@@ -28,5 +28,9 @@ if (empty($_GET['api_key']) || $_GET['api_key'] != $conf['api_key']) {
 $sql = "SELECT pk id, stop_lon as lat, stop_lat as 'long'
         FROM gtfs_stop";
 $stops = $DB->query($sql);
+if (empty($stops)) {
+    echo json_encode(['error'=>'Pas de stop en BDD']);
+    die();
+}
 // echo "Stops: ".count($stops)."<br>\n";
 echo json_encode($stops);

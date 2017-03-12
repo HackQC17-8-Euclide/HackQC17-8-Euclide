@@ -7,7 +7,7 @@ $conf = require __DIR__ . '/conf.php';
 $confSQL = $conf['confSQL'];
 $DB = new \HackQC17_8_Euclide\DB($confSQL['sql_host'], $confSQL['sql_user'], $confSQL['sql_pass'], $confSQL['sql_db']);
 
-header('Content-Type: application/json');
+// header('Content-Type: application/json');
 if (empty($_GET['api_key']) || $_GET['api_key'] != $conf['api_key']) {
     echo json_encode(['error'=>'mauvaise api_key']);
     die();
@@ -47,6 +47,10 @@ $sql = "SELECT DISTINCT c.service_id
                )
         )";
 $services = $DB->query($sql, ['curDatetime' => $curDate]);
+if (empty($services)) {
+    echo json_encode(['error'=>'Pas de service disponible pour la journée du: '.$curDate]);
+    die();
+}
 // echo "Services filtrés: ".count($services)."<br>\n";
 $service_ids = [];
 foreach ($services as $v)
@@ -61,6 +65,10 @@ $sql = "SELECT st.pk
             AND st.arrival_time > :curDatetime
             AND st.service_id IN (".'"'.implode('", "', $service_ids).'"'.")";
 $trips = $DB->query($sql, ['curDatetime' => $curDatetime]);
+if (empty($trips)) {
+    echo json_encode(['error'=>'Pas de trip pour cette date - heure: '.$curDatetime]);
+    die();
+}
 // echo "Trips filtrés: ".count($trips)."<br>\n";
 $trip_pk = [];
 foreach ($trips as $v)
@@ -69,5 +77,9 @@ $sql = "SELECT stop_pk stop_id, trip_pk trip_id, arrival_time arr, departure_tim
         FROM gtfs_stop_times st
         WHERE st.trip_pk IN (".implode(', ', $trip_pk).")";
 $stopTimes = $DB->query($sql, ['curDatetime' => $curDatetime]);
+if (empty($stopTimes)) {
+    echo json_encode(['error'=>'Pas de stop times trouvés ... O.o le '.$curDatetime]);
+    die();
+}
 // echo "Stop times filtrés: ".count($stopTimes)."<br>\n";
 echo json_encode($stopTimes);
