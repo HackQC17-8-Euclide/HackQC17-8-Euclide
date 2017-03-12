@@ -46,8 +46,8 @@ export class Stops_times {
            Stops_times.formatted_stop_times[i].stop = Stops.formatted_stops[j];
            Stops.formatted_stops[j].times[Stops.formatted_stops[j].times.length]=Stops_times.formatted_stop_times[i];
         }
-        //  console.log (Stops.formatted_stops[j].id);
-        //   console.log (Stops_times.stops_times[i].stop_id);
+         // console.log (Stops.formatted_stops[j].id);
+           //console.log (Stops_times.stops_times[i].stop_id);
       }
      
     }

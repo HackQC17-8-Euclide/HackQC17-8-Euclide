@@ -22,7 +22,7 @@ export class accessibilite {
     static accessibilite(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
         var vitesse_pied = 1950;
         var vitesse_velo = 15;
-        console.log(acc);
+       // console.log(acc);
         //creation du tableau de résultats
         //var res = new Array<couple<Pos, number>>();
         // on ajoute le cerle de départ
@@ -30,7 +30,7 @@ export class accessibilite {
         c.arg1 = pos;
         c.arg2 = accessibilite.compute_limit_distance(vitesse_pied, temps_en_s);
         acc[acc.length] = c;
-        //console.log(acc);
+        console.log(acc);
         //on va chercher toutes les stations accessibles à pied 
         // on les récupère ds un tableau de couples (arrêt, distance)
         var liste_stations = new Array<couple<Stop, number>>();

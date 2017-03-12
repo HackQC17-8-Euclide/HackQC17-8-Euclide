@@ -1,12 +1,16 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterContentInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
-import { pos_bus } from './services/pos_bus'
-import { accessibilite } from './services/accessibilite'
+import { accessibilite,couple } from './services/accessibilite'
+import { Stops } from './services/Stops'
+import {pos_bus,Pos} from './services/pos_bus'
+
 import * as d3 from 'd3';
 
 const DIGIT_LIMIT = 10;
-
+ let latitu 
+ let longit
+ 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -25,7 +29,12 @@ export class AppComponent implements OnInit, AfterContentInit {
   private minutes: string;
   private seconds: string;
   private stream: any;
-  
+  private positions: Array<Pos>;
+  private posi:Pos;
+  private acces:couple<Pos, number>[];
+   tempsActuel():number{
+    return parseInt(this.hours)*3600+parseInt(this.minutes)*60+parseInt(this.seconds);
+   }
   private options = {
     enableHighAccuracy: true,
     timeout: 5000,
@@ -34,7 +43,17 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   constructor(private mapService: MapService, private changeDetector: ChangeDetectorRef) {
     this.timer = Observable.timer(1000, 1000);
-
+     //this.positions = pos_bus.get_pos_bus(tempsActuel());
+     this.positions = pos_bus.get_pos_bus(27600);
+     this.posi= new Pos();
+     for(let i of this.positions){
+       if(i !==undefined){
+         latitu =i.lat
+         longit=i.long
+       }
+     }
+    
+       // console.log(longit); 
   }
 
 
@@ -66,8 +85,13 @@ export class AppComponent implements OnInit, AfterContentInit {
       })
       .then((pos: any) => {
         this.initMap(pos[0], pos[1]);
-      });
-
+        this.acces = accessibilite.accessibilites(pos,parseInt(document.getElementById('fader').getAttribute('value')),this.tempsActuel());
+        console.log(this.acces);
+    });
+      
+   
+  
+    
   }
   tick() {
     this.time = new Date();
@@ -158,7 +182,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     //   .attr("fill", function (d) { return d.color; });
     this.markCurrentLocation(lat, long);
   }
-  markCurrentLocation(lat: number, long: number,radius:number=50) {
+  markCurrentLocation(lat: number, long: number, radius: number = 50) {
 
     // let svg = d3.select(this.map.getPanes().overlayPane).append("svg"),
     //   g = svg.append("g").attr("class", "leaflet-zoom-hide");
@@ -181,7 +205,24 @@ export class AppComponent implements OnInit, AfterContentInit {
         fillColor: '#f03',
         //fillOpacity: 0.5,
       }).addTo(this.map);
-
+    // let point_position=L.circle([latitu,longit],20, {
+    //     color: 'green',
+    //     fillColor: '#f03',
+    //     //fillOpacity: 0.5,
+    //   }).addTo(this.map);
+    let ico = L.divIcon({className: 'my-div-icon'});
+      let myIcon = L.icon({
+        iconUrl: '../icon_bus.png',
+       // iconRetinaUrl: 'my-icon@2x.png',
+        iconSize: [38, 50],
+        iconAnchor: [22, 94],
+        popupAnchor: [-3, -76],
+       // shadowUrl: 'my-icon-shadow.png',
+        //shadowRetinaUrl: 'my-icon-shadow@2x.png',
+        shadowSize: [68, 95],
+        shadowAnchor: [22, 94]
+      })
+    let icon =L.marker([latitu, longit],{icon:myIcon}).addTo(this.map);
   }
 
   projectPoint(x, y) {
