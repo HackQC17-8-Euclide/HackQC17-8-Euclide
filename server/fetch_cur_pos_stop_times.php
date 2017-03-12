@@ -7,7 +7,8 @@ $conf = require __DIR__ . '/conf.php';
 $confSQL = $conf['confSQL'];
 $DB = new \HackQC17_8_Euclide\DB($confSQL['sql_host'], $confSQL['sql_user'], $confSQL['sql_pass'], $confSQL['sql_db']);
 
-// header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
+header('Content-Type: application/json');
 if (empty($_GET['api_key']) || $_GET['api_key'] != $conf['api_key']) {
     echo json_encode(['error'=>'mauvaise api_key']);
     die();
@@ -73,10 +74,19 @@ if (empty($trips)) {
 $trip_pk = [];
 foreach ($trips as $v)
     $trip_pk[] = $v['pk'];
-$sql = "SELECT stop_pk stop_id, trip_pk trip_id, arrival_time arr, departure_time dep, stop_sequence
+$sql = "SELECT stop_pk stop_id, trip_pk trip_id, arrival_sec arr, departure_sec dep, stop_sequence
         FROM gtfs_stop_times st
         WHERE st.trip_pk IN (".implode(', ', $trip_pk).")";
 $stopTimes = $DB->query($sql, ['curDatetime' => $curDatetime]);
+foreach ($stopTimes as $key => $value)
+    $stopTimes[$key] = [
+        'stop_id' => 1*$value['stop_id'],
+        'trip_id' => 1*$value['trip_id'],
+        'arr' => 1*$value['arr'],
+        'dep' => 1*$value['dep'],
+        'stop_sequence' => 1*$value['stop_sequence']
+    ];
+
 if (empty($stopTimes)) {
     echo json_encode(['error'=>'Pas de stop times trouvés ... O.o le '.$curDatetime]);
     die();
