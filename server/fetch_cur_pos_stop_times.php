@@ -63,7 +63,7 @@ $sql = "SELECT st.pk
         FROM gtfs_trip st
             LEFT JOIN gtfs_agency a ON a.pk = st.agency_pk
         WHERE st.departure_time < DATE_ADD(:curDatetime, INTERVAL 30 MINUTE)
-            AND st.arrival_time > :curDatetime
+            AND st.arrival_time > DATE_SUB(:curDatetime, INTERVAL 10 MINUTE)
             AND st.service_id IN (".'"'.implode('", "', $service_ids).'"'.")";
 $trips = $DB->query($sql, ['curDatetime' => $curDatetime]);
 if (empty($trips)) {
