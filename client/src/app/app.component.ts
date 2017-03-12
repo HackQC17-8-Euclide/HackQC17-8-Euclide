@@ -1,3 +1,4 @@
+
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterContentInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
@@ -250,3 +251,4 @@ export class AppComponent implements OnInit, AfterContentInit {
   }
 
 }
+
