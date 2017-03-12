@@ -23,6 +23,7 @@ export class accessibilite {
     }
 
     static accessibilite(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
+        if (acc.length>20) return acc;
         var vitesse_pied = 3;
         var vitesse_velo = 9.5;
         //creation du tableau de résultats
