@@ -14,19 +14,6 @@ export  class Pos {
     }
 }
 
-export class trip {
-    pred: trip;
-    succ: trip;
-    id: "58c3782d73f81c56719891b8";
-    trip_id: 4;
-    arr: 6636;
-    dep: 12872;
-    stop_id: 4;
-    stop_sequence: 8;
-    is_terminus: true;
-    is_head: true;
-}
-
 
 export class pos_bus {
 
