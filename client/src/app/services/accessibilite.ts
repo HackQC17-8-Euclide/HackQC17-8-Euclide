@@ -22,7 +22,6 @@ export class accessibilite {
     static accessibilite(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
         var vitesse_pied = 1950;
         var vitesse_velo = 15;
-        console.log(acc);
         //creation du tableau de résultats
         //var res = new Array<couple<Pos, number>>();
         // on ajoute le cerle de départ
