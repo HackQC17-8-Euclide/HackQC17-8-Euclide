@@ -29,15 +29,27 @@ export class accessibilite {
         var c = new couple<Pos, number>(null, null);
         c.arg1 = pos;
         c.arg2 = accessibilite.compute_limit_distance(vitesse_pied, temps_en_s);
+        var vel = new couple<Pos, number>(null, null);
         acc[acc.length] = c;
+        vel.arg1 = pos;
+        vel.arg2 = accessibilite.compute_limit_distance(vitesse_velo, temps_en_s);
+        acc[acc.length] = vel;
         //on va chercher toutes les stations accessibles à pied 
         // on les récupère ds un tableau de couples (arrêt, distance)
         var liste_stations = new Array<couple<Stop, number>>();
         liste_stations = accessibilite.compute_accessible_stops(c.arg2, pos);
 
+        //on va chercher toutes les stations accessibles à velo 
+        // on les récupère ds un tableau de couples (arrêt, distance)
+        var liste_stations_velo = new Array<couple<Stop, number>>();
+        liste_stations_velo = accessibilite.compute_accessible_stops(vel.arg2, pos);
+
         // on le transforme en un tableau de couples (arrêt, temps d'arrivée)
         for (var i = 0; i < liste_stations.length; i++) {
             liste_stations[i].arg2 = temps_actuel_en_s + (liste_stations[i].arg2 / vitesse_pied * 3600);
+        }
+          for (var i = 0; i < liste_stations_velo.length; i++) {
+            liste_stations_velo[i].arg2 = temps_actuel_en_s + (liste_stations_velo[i].arg2 / vitesse_velo * 3600);
         }
         //on cherche tous les trip qui passent par chaque arrêt aprèes son temps d'arrivée
         var times = new Array<Stop_time>();
@@ -45,6 +57,15 @@ export class accessibilite {
             var tab = liste_stations[i].arg1.times;
             for (var j = 0; j < tab.length; j++) {
                 if (tab[j].arr > liste_stations[i].arg2 && tab[j].arr < liste_stations[i].arg2 + temps_en_s) {
+                    times[times.length] = tab[j];
+                }
+            }
+        }
+           var times = new Array<Stop_time>();
+        for (var i = 0; i < liste_stations_velo.length; i++) {
+            var tab = liste_stations_velo[i].arg1.times;
+            for (var j = 0; j < tab.length; j++) {
+                if (tab[j].arr > liste_stations_velo[i].arg2 && tab[j].arr < liste_stations_velo[i].arg2 + temps_en_s) {
                     times[times.length] = tab[j];
                 }
             }
