@@ -6,5 +6,6 @@ return [
         'sql_db'   => "hackqc17",
         'sql_user' => "root",
         'sql_pass' => ""
-    ]
+    ],
+    'api_key' => ''
 ];

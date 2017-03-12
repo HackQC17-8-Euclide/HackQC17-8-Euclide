@@ -58,8 +58,9 @@ class GtfsController {
         $this->TripCtrl = new \HackQC17_8_Euclide\GFTS\GtfsTripController($this->path.'trips.txt', $this);
         $this->ShapeCtrl->export();
         $this->TripCtrl->export();
-        $this->StopTimeCtrl = new \HackQC17_8_Euclide\GFTS\GtfsStopTimeController($this->path.'stop_times.txt', $this, 'autoExport');
-        $this->StopTimeCtrl->export(false);
+        $this->TripCtrl->fetchDataDB();
+        $this->StopTimeCtrl = new \HackQC17_8_Euclide\GFTS\GtfsStopTimeController($this->path.'stop_times.txt', $this, ['autoExport'=>true]);
+        $this->TripCtrl->update(['departure_time', 'arrival_time', 'departure_sec', 'arrival_sec']);
         $this->timeLoad = [
             'AgencyCtrl' => $this->AgencyCtrl->timeLoad,
             'StopCtrl' => $this->StopCtrl->timeLoad,
