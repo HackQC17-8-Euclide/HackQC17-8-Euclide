@@ -1,4 +1,3 @@
-
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterContentInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
@@ -60,7 +59,6 @@ export class AppComponent implements OnInit, AfterContentInit {
 
 
   ngOnInit() {
-<<<<<<< HEAD
     Stops.compute_formatted_stops();
     Stops_times.compute_formatted_stop_times();
 
@@ -83,8 +81,6 @@ export class AppComponent implements OnInit, AfterContentInit {
       }).catch(error => {
         console.log('plantage');
       });
-=======
->>>>>>> origin/master
 
 
     this.timer.subscribe(
@@ -254,19 +250,7 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   affichageBus() {
     this.positions = pos_bus.get_pos_bus(this.tempsActuel());
-<<<<<<< HEAD
-    console.log((this.tempsActuel()))
-    console.log(Stops.formatted_stops);
-    for (let i of this.positions) {
-      if (i !== undefined) {
-        latitu = i.lat
-        longit = i.long
-      }
-      
-    }
-=======
     console.log(this.positions)
->>>>>>> origin/master
     let myIcon = L.icon({
       iconUrl: '../icon_bus.png',
       iconSize: [38, 50],
