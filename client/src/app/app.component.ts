@@ -172,6 +172,12 @@ export class AppComponent implements OnInit, AfterContentInit {
     //   .attr("r", "15")
     //   .attr("fill", "green")
     let marker = L.marker([lat, long]).addTo(this.map);
+    var circle = L.circle([lat, long],100,
+    {
+    color: 'red',
+    fillColor: '#f03',
+    //fillOpacity: 0.5,
+  }).addTo(this.map);
 
   }
 
