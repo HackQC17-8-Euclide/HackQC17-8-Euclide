@@ -2,28 +2,22 @@ import {Stop} from './Stops'
 import {Stops} from './Stops'
 
 export class Stop_time {
-  id: number;
   trip_id: number;
   arr: number;
   dep: number;
   stop_id: number;
   stop_sequence: number;
-  is_terminus: boolean;
-  is_head: boolean;
   pred: Stop_time;
   succ: Stop_time;
   stop: Stop;
 
 
-  constructor(id, trip_id, arr, dep, stop_id, stop_sequence, is_terminus, is_head) {
-    this.id = id;
+  constructor( trip_id, arr, dep, stop_id, stop_sequence) {
     this.trip_id = trip_id;
     this.arr = arr;
     this.dep = dep;
     this.stop_id = stop_id;
     this.stop_sequence = stop_sequence;
-    this.is_terminus = is_terminus;
-    this.is_head = is_head;
     this.pred=null;
     this.succ=null;
     this.stop =null;
@@ -38,7 +32,7 @@ export class Stops_times {
   static compute_formatted_stop_times() {
     for (var i = 0; i < Stops_times.stops_times.length; i++) {
       var a = Stops_times.stops_times[i];
-      Stops_times.formatted_stop_times[i] = new Stop_time(a._id, a.trip_id, a.arr, a.dep, a.stop_id, a.stop_sequence, a.is_terminus, a.is_head);
+      Stops_times.formatted_stop_times[i] = new Stop_time(a.trip_id, a.arr, a.dep, a.stop_id, a.stop_sequence);
     }
     for (var i = 0; i < Stops_times.stops_times.length; i++) {
       for (var j=0;j<Stops.formatted_stops.length;j++){
@@ -71,7 +65,8 @@ export class Stops_times {
         }
     }
 
-  private static stops_times = [ {
+
+  public static stops_times = [ {
       "_id": 1,
       "trip_id": 426077,
       "arr": 2800,
@@ -653,4 +648,5 @@ export class Stops_times {
       "is_head": true
     }
   ];*/
+
 }
