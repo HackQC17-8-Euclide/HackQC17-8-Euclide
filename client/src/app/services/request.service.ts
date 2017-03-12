@@ -13,10 +13,12 @@ export class RequestService {
     }
 
     public getStops(): Promise<Array<any>> {
+        var d = new Date();
+        var dateIso = d.toDateString()+' '+d.toTimeString();
         return this.http.get('http://' + this.ip + '/8_euclide/fetch_cur_pos_stop.php?' +
-        'api_key=JesusVousAime<3!&cur_datetime=2017-03-12 20:42&lng=-73.123&lat=45.564')
+            'api_key=JesusVousAime<3!&cur_datetime=' +dateIso+ '&lng=-73.123&lat=45.564')
             .toPromise()
-            .then( response => {
+            .then(response => {
                 this.stop_data = response.json();
                 return this.stop_data;
             })
@@ -24,8 +26,10 @@ export class RequestService {
     }
 
     public getStopTimes(): Promise<Array<any>> {
+        var d = new Date();
+        var dateIso = d.toDateString()+' '+d.toTimeString();
         return this.http.get('http://' + this.ip + '/8_euclide/fetch_cur_pos_stop_times.php?' +
-        'api_key=JesusVousAime<3!&cur_datetime=2017-03-12 20:42&lng=-73.123&lat=45.564')
+            'api_key=JesusVousAime<3!&cur_datetime=' +dateIso+ '&lng=-73.123&lat=45.564')
             .toPromise()
             .then(response => {
                 this.time_data = response.json();

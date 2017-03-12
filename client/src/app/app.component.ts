@@ -59,25 +59,6 @@ export class AppComponent implements OnInit, AfterContentInit {
 
 
   ngOnInit() {
-    this.reqserv.getStops()
-      .then((res) => {
-        Stops.stops = res;
-        console.log(Stops.stops);
-        Stops.compute_formatted_stops();
-
-      }).catch(error => {
-        console.log('plantage');
-      }).then(() => {
-        this.reqserv.getStopTimes()
-          .then((res) => {
-            Stops_times.stops_times = res;
-            console.log(Stops_times.stops_times);
-            Stops_times.compute_formatted_stop_times();
-            this.affichageBus();
-          });
-      }).catch(error => {
-        console.log('plantage');
-      });
 
     this.timer.subscribe(
       //onNext
@@ -122,6 +103,8 @@ export class AppComponent implements OnInit, AfterContentInit {
         this.initMap(45.404476, -71.888351);
       })
       .then((pos: any) => {
+        console.log('cur pos', pos);
+        
         this.initMap(pos[0], pos[1]);
         this.posi = pos;
         this.AffichageAccessibilite(parseInt(document.getElementById('fader').getAttributeNode('value').value) * 60, pos);
@@ -134,6 +117,7 @@ export class AppComponent implements OnInit, AfterContentInit {
       this.accessi.removeLayer(layer);
     })
     this.acces = accessibilite.accessibilites(pos, tpsEnSec, this.tempsActuel());
+    // console.log(this.acces);
     for (var i of this.acces) {
       this.accessi.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2 * 1000, {
         stroke: false, color: 'green'
@@ -161,27 +145,10 @@ export class AppComponent implements OnInit, AfterContentInit {
   }
 
   formatTimer() {
-
-    if (this.time.getHours() < DIGIT_LIMIT) {
-      this.hours = '0' + String(this.time.getHours());
-    }
-    else {
-      this.hours = String(this.time.getHours());
-    }
-
-    if (this.time.getMinutes() < DIGIT_LIMIT) {
-      this.minutes = '0' + String(this.time.getMinutes());
-    }
-    else {
-      this.minutes = String(this.time.getMinutes());
-    }
-
-    if (this.time.getSeconds() < DIGIT_LIMIT) {
-      this.seconds = '0' + String(this.time.getSeconds());
-    }
-    else {
-      this.seconds = String(this.time.getSeconds());
-    }
+    var dateIso = this.time.toTimeString();
+    this.hours = dateIso.substr(0,2);
+    this.minutes = dateIso.substr(3,2);
+    this.seconds = dateIso.substr(6,2);
   }
 
   updateOutput(event: any, output: any) {
@@ -225,6 +192,27 @@ export class AppComponent implements OnInit, AfterContentInit {
     }).addTo(this.map);
 
     this.markCurrentLocation(lat, long);
+
+    
+    this.reqserv.getStops()
+      .then((res) => {
+        Stops.stops = res;
+        console.log('Stops.stops', Stops.stops);
+        Stops.compute_formatted_stops();
+        this.affichageStop();
+      }).catch(error => {
+        console.log('plantage 1', error);
+      });
+
+      this.reqserv.getStopTimes()
+        .then((res) => {
+          Stops_times.stops_times = res;
+          console.log('Stops_times.stops_times');
+          Stops_times.compute_formatted_stop_times();
+          // this.affichageBus();
+        }).catch(error => {
+          console.log('plantage 2', error);
+        });
   }
   markCurrentLocation(lat: number, long: number, radius: number = 50) {
 
@@ -239,13 +227,7 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   affichageBus() {
     this.positions = pos_bus.get_pos_bus(this.tempsActuel());
-    for (let i of this.positions) {
-      if (i !== undefined) {
-        latitu = i.lat
-        longit = i.long
-
-      }
-    }
+    console.log(this.positions)
     let myIcon = L.icon({
       iconUrl: '../icon_bus.png',
       iconSize: [38, 50],
@@ -260,12 +242,31 @@ export class AppComponent implements OnInit, AfterContentInit {
     let count = 0;
     for (var i of this.positions) {
       if (i !== undefined && count < 20) {
-
-        this.buses.addLayer(L.marker([latitu, longit], { icon: myIcon }))
+        this.buses.addLayer(L.marker([i.lat, i.long], { icon: myIcon }))
         count++;
       } else break;
     }
     this.buses.addTo(this.map);
+  }
+  affichageStop() {
+    var posit = Stops.formatted_stops;
+    let myIcon = L.icon({
+      iconUrl: '../icon_bus.png',
+      iconSize: [10, 10],
+      iconAnchor: [22, 94],
+      popupAnchor: [-3, -76],
+      shadowSize: [68, 95],
+      shadowAnchor: [22, 94]
+    })
+    let count = 0;
+    console.log(this.map, 'this.map');
+    
+    for (var i of posit) {
+      if (i !== undefined && count < 30) {
+        this.map.addLayer(L.marker([i.lat, i.long], { icon: myIcon }))
+        count++;
+      } else break;
+    }
   }
   projectPoint(x, y) {
     let point = this.map.latLngToLayerPoint(new L.LatLng(y, x));
