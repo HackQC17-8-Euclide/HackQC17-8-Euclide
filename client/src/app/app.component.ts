@@ -2,6 +2,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterContentInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
+import { RequestService } from './services/request.service';
 import { accessibilite, couple } from './services/accessibilite'
 import { Stops } from './services/Stops'
 import { Stops_times } from './services/Stops_times'
@@ -19,7 +20,7 @@ let longit
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [MapService],
+  providers: [MapService, RequestService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
@@ -52,7 +53,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     maximumAge: 0
   };
 
-  constructor(private mapService: MapService, private changeDetector: ChangeDetectorRef) {
+  constructor(private mapService: MapService, private changeDetector: ChangeDetectorRef, private reqserv: RequestService) {
     this.timer = Observable.timer(1000, 1000);
     this.timerBus = Observable.timer(2000, 2000);
   }
@@ -61,6 +62,27 @@ export class AppComponent implements OnInit, AfterContentInit {
   ngOnInit() {
     Stops.compute_formatted_stops();
     Stops_times.compute_formatted_stop_times();
+
+    this.reqserv.getStops()
+      .then((res) => {
+        Stops.stops = res;
+        console.log(Stops.stops);
+        Stops.compute_formatted_stops();
+
+      }).catch(error => {
+        console.log('plantage');
+      }).then(() => {
+        this.reqserv.getStopTimes()
+          .then((res) => {
+            Stops_times.stops_times = res;
+            console.log(Stops_times.stops_times);
+            Stops_times.compute_formatted_stop_times();
+            this.affichageBus();
+          });
+      }).catch(error => {
+        console.log('plantage');
+      });
+
 
     this.timer.subscribe(
       //onNext
@@ -118,24 +140,26 @@ export class AppComponent implements OnInit, AfterContentInit {
     })
     this.acces = accessibilite.accessibilites(pos, tpsEnSec, this.tempsActuel());
     for (var i of this.acces) {
-      this.accessi.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2*1000 ,{
-        stroke:false,color:'green'
+      this.accessi.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2 * 1000, {
+        stroke: false, color: 'green'
       }));
 
     }
-   this.accessi.addTo(this.map);
+    this.accessi.addTo(this.map);
 
   }
-    AffichageAccessibiliteVelo(tpsEnSec: number, pos: Pos) {
+  AffichageAccessibiliteVelo(tpsEnSec: number, pos: Pos) {
     this.accessiVelo.eachLayer((layer: any) => {
       this.accessiVelo.removeLayer(layer);
     })
     this.accesV = accessibilite.accessibilitesV(pos, tpsEnSec, this.tempsActuel());
     for (var i of this.accesV) {
-      this.accessiVelo.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2*1000,{
-        stroke:false,color:'blue'}));
+      this.accessiVelo.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2 * 1000, {
+        stroke: false, color: 'blue'
+      }));
     }
     this.accessiVelo.addTo(this.map);
+
   }
   tick() {
     this.time = new Date();
@@ -212,21 +236,20 @@ export class AppComponent implements OnInit, AfterContentInit {
     let marker = L.marker([lat, long]).addTo(this.map);
     var circle = L.circle([lat, long], radius,
       {
-        stroke:false,
+        stroke: false,
         color: 'red',
         fillColor: '#f03',
       }).addTo(this.map);
   }
 
   affichageBus() {
-    this.positions = pos_bus.get_pos_bus(this.tempsActuel()+38600-2635);
-    console.log((this.tempsActuel()+38600-2635))
+    this.positions = pos_bus.get_pos_bus(this.tempsActuel());
+    console.log((this.tempsActuel()))
     console.log(Stops.formatted_stops);
     for (let i of this.positions) {
       if (i !== undefined) {
         latitu = i.lat
         longit = i.long
-        
       }
       
     }
@@ -241,9 +264,14 @@ export class AppComponent implements OnInit, AfterContentInit {
     this.buses.eachLayer((layer: any) => {
       this.buses.removeLayer(layer);
     })
+    let count = 0;
     for (var i of this.positions) {
-      if (i !== undefined)
-        this.buses.addLayer(L.marker([i.lat, i.long], { icon: myIcon }))
+
+      if (i !== undefined && count < 20) {
+
+        this.buses.addLayer(L.marker([latitu, longit], { icon: myIcon }))
+        count++;
+      } else break;
     }
     this.buses.addTo(this.map);
   }

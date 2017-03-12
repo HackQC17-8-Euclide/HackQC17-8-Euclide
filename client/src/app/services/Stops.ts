@@ -243,7 +243,6 @@ export class Stops {
 {"id":14927,"lat":45.418694,"long":-71.865731},
 {"id":15048,"lat":45.395993,"long":-71.966683}]
 
-
   static compute_formatted_stops() {
     for (var i = 0; i < Stops.stops.length; i++) {
       Stops.formatted_stops[i] = new Stop(Stops.stops[i].id, Stops.stops[i].long, Stops.stops[i].lat);
