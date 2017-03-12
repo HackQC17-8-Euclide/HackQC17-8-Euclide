@@ -121,9 +121,7 @@ export class grille {
                // charger données du point
                 var s =grille.score(accessibilite.accessibilites(pt,heure_initiale,duree));
             }
-        }
-        var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
-        MSFileSaver.saveAs(blob, "hello world.txt");
+        }        
     }
 
     static point(max: Pos, min: Pos, lat: number, long: number): Pos {
