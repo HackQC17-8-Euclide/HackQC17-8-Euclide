@@ -37,6 +37,8 @@ export class AppComponent implements OnInit, AfterContentInit {
   private buses = new L.LayerGroup([]);
   private maps = new L.LayerGroup([]);
   private accessi = new L.LayerGroup([]);
+  private accessiVelo = new L.LayerGroup([]);
+
   tempsActuel(): number {
     return parseInt(this.hours) * 3600 + parseInt(this.minutes) * 60 + parseInt(this.seconds);
   }
@@ -114,6 +116,18 @@ export class AppComponent implements OnInit, AfterContentInit {
     this.accessi.addTo(this.map);
 
   }
+    AffichageAccessibiliteVelo(tpsEnSec: number, pos: Pos) {
+    this.accessiVelo.eachLayer((layer: any) => {
+      this.accessiVelo.removeLayer(layer);
+    })
+    this.acces = accessibilite.accessibilites(pos, tpsEnSec, this.tempsActuel());
+    for (var i of this.acces) {
+      this.accessiVelo.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2 * 1000,{stroke:false,color: 'red',
+        fillColor: 'green'}));
+    }
+    this.accessiVelo.addTo(this.map);
+
+  }
   tick() {
     this.time = new Date();
   }
@@ -168,7 +182,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     this.map = L.map('mapId', {
       zoomControl: false,
       center: L.latLng(lat, long),
-      zoom: 17,
+      zoom: 14,
       minZoom: 5,
       maxZoom: 20,
     });

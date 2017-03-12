@@ -1,4 +1,4 @@
-import {Stop_time} from'./Stops_times'
+import {Stop_time} from './Stops_times'
 import {Pos} from './pos_bus'
 
 export class Stop{
