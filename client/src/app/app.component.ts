@@ -1,5 +1,6 @@
 
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterContentInit } from '@angular/core';
+import {Http} from '@angular/http';
 import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
 import { RequestService } from './services/request.service';
@@ -42,13 +43,14 @@ export class AppComponent implements OnInit, AfterContentInit {
     timeout: 5000,
     maximumAge: 0
   };
+  private data: any;
   tempsActuel(): number {
     return parseInt(this.hours) * 3600 + parseInt(this.minutes) * 60 + parseInt(this.seconds);
   }
 
 
 
-  constructor(private mapService: MapService, private requestService: RequestService, private changeDetector: ChangeDetectorRef) {
+  constructor(private mapService: MapService, private requestService: RequestService, private changeDetector: ChangeDetectorRef , private http:Http) {
     this.timer = Observable.timer(1000, 1000);
     this.timerBus = Observable.timer(2000, 2000);
   }
@@ -62,8 +64,7 @@ export class AppComponent implements OnInit, AfterContentInit {
   refreshStop() {
     this.requestService.getStops()
       .then((data: any) => {
-        Stops.stops = JSON.parse(data);
-        console.log(data);
+        Stops.stops = data;
         Stops.compute_formatted_stops();
       }
 
@@ -78,8 +79,8 @@ export class AppComponent implements OnInit, AfterContentInit {
   refreshStopTime() {
     this.requestService.getStopTimes()
       .then((data: any) => {
-        Stops_times.stops_times = JSON.parse(data);
-        console.log(data);
+        Stops_times.stops_times = data;
+      
         Stops_times.compute_formatted_stop_times();
       }
       )
@@ -90,8 +91,13 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   }
   ngOnInit() {
-    this.refreshStop();
-    this.refreshStopTime();
+
+    //requests
+    //this.refreshStop();
+    //this.refreshStopTime();
+
+    //files reading
+    
     this.timer.subscribe(
       //onNext
       () => {
@@ -146,7 +152,6 @@ export class AppComponent implements OnInit, AfterContentInit {
       this.accessi.removeLayer(layer);
     })
     this.acces = accessibilite.accessibilites(pos, tpsEnSec, this.tempsActuel());
-    console.log(this.acces);
     for (var i of this.acces) {
       this.accessi.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2 * 1000));
     }
