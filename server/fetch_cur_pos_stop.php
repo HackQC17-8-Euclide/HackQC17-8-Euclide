@@ -27,7 +27,7 @@ if (empty($_GET['api_key']) || $_GET['api_key'] != $conf['api_key']) {
 // }
 
 $sql = "SELECT pk id, stop_lon as lat, stop_lat as 'long'
-        FROM gtfs_stop";
+        FROM gtfs_stop where agency_pk = 18";
 $stops = $DB->query($sql);
 foreach ($stops as $key => $value)
     $stops[$key] = [
