@@ -76,7 +76,7 @@ foreach ($trips as $v)
     $trip_pk[] = $v['pk'];
 $sql = "SELECT stop_pk stop_id, trip_pk trip_id, arrival_sec arr, departure_sec dep, stop_sequence
         FROM gtfs_stop_times st
-        WHERE st.trip_pk IN (".implode(', ', $trip_pk).")";
+         where agency_pk = 18 AND st.trip_pk IN (".implode(', ', $trip_pk).") ";
 $stopTimes = $DB->query($sql, ['curDatetime' => $curDatetime]);
 foreach ($stopTimes as $key => $value)
     $stopTimes[$key] = [
