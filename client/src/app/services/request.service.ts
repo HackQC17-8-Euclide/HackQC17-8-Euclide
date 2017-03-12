@@ -5,23 +5,19 @@ import 'rxjs/add/operator/toPromise';
 
 @Injectable()
 export class RequestService {
-    stop_data: Object;
-    time_data: Object;
+    stop_data: any;
+    time_data: any;
     ip: string = '10.128.154.203';
 
     constructor(private http: Http) {
-        this.stop_data = new Object();
-        this.time_data = new Object();
     }
 
     public getStops(): Promise<Object> {
         return this.http.get('http://' + this.ip + '/8_euclide/fetch_cur_pos_stop.php?' +
         'api_key=JesusVousAime<3!&cur_datetime=2017-03-12 20:42&lng=-73.123&lat=45.564')
             .toPromise()
-            .then(response => {
-                const temp = response;
-                this.stop_data  = JSON.parse(temp.toString())[1];
-                console.log(this.stop_data);
+            .then( response => {
+                this.stop_data = response.json();
                 return this.stop_data;
             })
             .catch(this.handleError);
@@ -32,10 +28,10 @@ export class RequestService {
         'api_key=JesusVousAime<3!&cur_datetime=2017-03-12 20:42&lng=-73.123&lat=45.564')
             .toPromise()
             .then(response => {
-                const temp = response.json();
-                this.time_data  = JSON.parse(temp.toString());
+                this.time_data = response.json();
                 console.log(this.time_data);
                 return this.time_data;
+
             })
             .catch(this.handleError);
     }

@@ -145,6 +145,7 @@ export class AppComponent implements OnInit, AfterContentInit {
       this.accessi.removeLayer(layer);
     })
     this.acces = accessibilite.accessibilites(pos, tpsEnSec, this.tempsActuel());
+    console.log(this.acces);
     for (var i of this.acces) {
       this.accessi.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2 * 1000));
     }
@@ -246,6 +247,7 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   affichageBus() {
     this.positions = pos_bus.get_pos_bus(this.tempsActuel());
+    console.log(this.positions);
     for (let i of this.positions) {
       if (i !== undefined) {
         latitu = i.lat
