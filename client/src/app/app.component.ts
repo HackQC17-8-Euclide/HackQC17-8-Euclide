@@ -4,6 +4,8 @@ import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
 import { accessibilite, couple } from './services/accessibilite'
 import { Stops } from './services/Stops'
+import { Stops_times } from './services/Stops_times'
+
 import { pos_bus, Pos } from './services/pos_bus'
 import { LayerGroup } from 'leaflet'
 
@@ -57,6 +59,8 @@ export class AppComponent implements OnInit, AfterContentInit {
 
 
   ngOnInit() {
+    Stops.compute_formatted_stops();
+    Stops_times.compute_formatted_stop_times();
 
     this.timer.subscribe(
       //onNext
@@ -132,7 +136,6 @@ export class AppComponent implements OnInit, AfterContentInit {
         stroke:false,color:'blue'}));
     }
     this.accessiVelo.addTo(this.map);
-//console.log(this.accesV);
   }
   tick() {
     this.time = new Date();
@@ -189,7 +192,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     this.map = L.map('mapId', {
       zoomControl: false,
       center: L.latLng(lat, long),
-      zoom: 14,
+      zoom: 13,
       minZoom: 5,
       maxZoom: 20,
     });
@@ -216,13 +219,16 @@ export class AppComponent implements OnInit, AfterContentInit {
   }
 
   affichageBus() {
-    this.positions = pos_bus.get_pos_bus(this.tempsActuel());
+    this.positions = pos_bus.get_pos_bus(this.tempsActuel()+38600-2635);
+    console.log((this.tempsActuel()+38600-2635))
+    console.log(Stops.formatted_stops);
     for (let i of this.positions) {
       if (i !== undefined) {
         latitu = i.lat
         longit = i.long
-    
+        
       }
+      
     }
     let myIcon = L.icon({
       iconUrl: '../icon_bus.png',
@@ -237,7 +243,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     })
     for (var i of this.positions) {
       if (i !== undefined)
-        this.buses.addLayer(L.marker([latitu, longit], { icon: myIcon }))
+        this.buses.addLayer(L.marker([i.lat, i.long], { icon: myIcon }))
     }
     this.buses.addTo(this.map);
   }
