@@ -114,7 +114,6 @@ export class accessibilite {
 
 export class grille {
     static compute_scores(max:Pos,min:Pos,heure_initiale:number,duree:number){
-        var objElement = document.createElement('object');
         var N = 1000
         for (var i =0;i<N;i++){
             for(var j=0;j<=i;j++){

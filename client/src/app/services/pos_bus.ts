@@ -30,7 +30,7 @@ export class trip {
 
 export class pos_bus {
 
-    public static get_pos_bus(temps_actuel): Pos[] {
+    public static get_pos_bus(temps_actuel:number): Pos[] {
         Stops.compute_formatted_stops();
         Stops_times.compute_formatted_stop_times();
         //console.log(Stops_times.formatted_stop_times);
