@@ -1,0 +1,64 @@
+
+span {
+    font-size: 22px
+}
+
+.speedometer{
+    float: left;
+    margin-left: 30px;
+    margin-top: 0;
+    height: 40px;
+    padding: 0;
+    line-height: 40px;
+    font-size: 20px;
+    display: block;
+    text-align: center;
+}
+
+#mapId {
+    position:absolute;
+    top: 40px;
+    bottom: 40px;
+    right: 0px;
+    left: 0px;
+    width: 100%;
+}
+
+input[type=range],
+	::-moz-range-track,
+	 ::-ms-track {
+	 -webkit-appearance: none;
+     display : inline-block;
+     width : 50%;
+     height : 2px;
+}
+
+
+.footer {
+     bottom: 0;
+    height: 40px;
+    opacity: .9;
+    border-top: solid 1px;
+    height: 40px;
+    position: absolute;
+    width: 100%;
+    color: white;
+    opacity: .9;
+    background: deepskyblue;
+    z-index: 9999;
+    left: 0px;
+    right : 0px;
+    vertical-align: middle;
+    display : table-cell;
+    line-height: 40px;
+    margin: 0;
+}
+
+.clock {
+    min-width: 4em;
+    float: left;
+    margin-left: 20px;
+    margin-top: 0;
+    font-size: 18px;
+    cursor: pointer;
+}
