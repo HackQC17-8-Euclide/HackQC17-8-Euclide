@@ -18,10 +18,13 @@ export class accessibilite {
     static accessibilites(pos: Pos, temps_en_s: number, temps_actuel_en_s: number): couple<Pos, number>[] {
         return accessibilite.accessibilite(pos, temps_en_s, temps_actuel_en_s, new Array<couple<Pos, number>>());
     }
+    static accessibilitesV(pos: Pos, temps_en_s: number, temps_actuel_en_s: number): couple<Pos, number>[] {
+        return accessibilite.accessibiliteV(pos, temps_en_s, temps_actuel_en_s, new Array<couple<Pos, number>>());
+    }
 
     static accessibilite(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, acc: couple<Pos, number>[]): couple<Pos, number>[] {
-        var vitesse_pied = 10;
-        var vitesse_velo = 15;
+        var vitesse_pied = 3;
+        var vitesse_velo = 9.5;
         // console.log(acc);
         //creation du tableau de résultats
         //var res = new Array<couple<Pos, number>>();
@@ -33,7 +36,7 @@ export class accessibilite {
         acc[acc.length] = c;
         vel.arg1 = pos;
         vel.arg2 = accessibilite.compute_limit_distance(vitesse_velo, temps_en_s);
-        acc[acc.length] = vel;
+        //acc[acc.length] = vel;
         //on va chercher toutes les stations accessibles à pied 
         // on les récupère ds un tableau de couples (arrêt, distance)
         var liste_stations = new Array<couple<Stop, number>>();
@@ -61,12 +64,12 @@ export class accessibilite {
                 }
             }
         }
-           var times = new Array<Stop_time>();
+           var timesV = new Array<Stop_time>();
         for (var i = 0; i < liste_stations_velo.length; i++) {
             var tab = liste_stations_velo[i].arg1.times;
             for (var j = 0; j < tab.length; j++) {
                 if (tab[j].arr > liste_stations_velo[i].arg2 && tab[j].arr < liste_stations_velo[i].arg2 + temps_en_s) {
-                    times[times.length] = tab[j];
+                    timesV[timesV.length] = tab[j];
                 }
             }
         }
@@ -93,6 +96,81 @@ export class accessibilite {
         }
 
         return acc;
+    }
+      static accessibiliteV(pos: Pos, temps_en_s: number, temps_actuel_en_s: number, accV: couple<Pos, number>[]): couple<Pos, number>[] {
+        var vitesse_pied = 4;
+        var vitesse_velo = 15;
+        // console.log(acc);
+        //creation du tableau de résultats
+        //var res = new Array<couple<Pos, number>>();
+        // on ajoute le cerle de départ
+        var c = new couple<Pos, number>(null, null);
+        c.arg1 = pos;
+        c.arg2 = accessibilite.compute_limit_distance(vitesse_pied, temps_en_s);
+        var vel = new couple<Pos, number>(null, null);
+        //accV[accV.length] = c;
+        vel.arg1 = pos;
+        vel.arg2 = accessibilite.compute_limit_distance(vitesse_velo, temps_en_s);
+        accV[accV.length] = vel;
+        //on va chercher toutes les stations accessibles à pied 
+        // on les récupère ds un tableau de couples (arrêt, distance)
+        var liste_stations = new Array<couple<Stop, number>>();
+        liste_stations = accessibilite.compute_accessible_stops(c.arg2, pos);
+
+        //on va chercher toutes les stations accessibles à velo 
+        // on les récupère ds un tableau de couples (arrêt, distance)
+        var liste_stations_velo = new Array<couple<Stop, number>>();
+        liste_stations_velo = accessibilite.compute_accessible_stops(vel.arg2, pos);
+
+        // on le transforme en un tableau de couples (arrêt, temps d'arrivée)
+        for (var i = 0; i < liste_stations.length; i++) {
+            liste_stations[i].arg2 = temps_actuel_en_s + (liste_stations[i].arg2 / vitesse_pied * 3600);
+        }
+          for (var i = 0; i < liste_stations_velo.length; i++) {
+            liste_stations_velo[i].arg2 = temps_actuel_en_s + (liste_stations_velo[i].arg2 / vitesse_velo * 3600);
+        }
+        //on cherche tous les trip qui passent par chaque arrêt aprèes son temps d'arrivée
+        var times = new Array<Stop_time>();
+        for (var i = 0; i < liste_stations.length; i++) {
+            var tab = liste_stations[i].arg1.times;
+            for (var j = 0; j < tab.length; j++) {
+                if (tab[j].arr > liste_stations[i].arg2 && tab[j].arr < liste_stations[i].arg2 + temps_en_s) {
+                    times[times.length] = tab[j];
+                }
+            }
+        }
+           var timesV = new Array<Stop_time>();
+        for (var i = 0; i < liste_stations_velo.length; i++) {
+            var tab = liste_stations_velo[i].arg1.times;
+            for (var j = 0; j < tab.length; j++) {
+                if (tab[j].arr > liste_stations_velo[i].arg2 && tab[j].arr < liste_stations_velo[i].arg2 + temps_en_s) {
+                    timesV[timesV.length] = tab[j];
+                }
+            }
+        }
+        //récupération de tous les stop times accessibles (sans correspondance)
+        var acc_stop_times = new Array<Stop_time>();
+        for (var i = 0; i < times.length; i++) {
+            while (times[i].succ != null && times[i].succ.arr < temps_actuel_en_s + temps_en_s) {
+                acc_stop_times[acc_stop_times.length] = times[i].succ;
+                times[i] = times[i].succ;
+            }
+        }
+        //ajout des sols des correspondances
+        for (var stop of acc_stop_times) {
+            var b = true;
+            for (var s of accV) {
+                if (s.arg1 == stop.stop.pos)
+                    b = false;
+            }
+            if (b)
+                var r = accessibilite.accessibilite(stop.stop.pos, temps_en_s - (stop.arr - temps_actuel_en_s), stop.arr, accV);
+            //for (c of r){
+            //    acc[acc.length]=c;
+            //}
+        }
+
+        return accV;
     }
 
     static compute_limit_distance(vit_km_h: number, time_sec: number): number {

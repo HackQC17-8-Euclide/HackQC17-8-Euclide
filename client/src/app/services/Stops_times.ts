@@ -39,6 +39,7 @@ export class Stops_times {
         if (Stops.formatted_stops[j].id==Stops_times.stops_times[i].stop_id){
            Stops_times.formatted_stop_times[i].stop = Stops.formatted_stops[j];
            Stops.formatted_stops[j].times[Stops.formatted_stops[j].times.length]=Stops_times.formatted_stop_times[i];
+           break;
         }
       }
      
@@ -50,16 +51,20 @@ export class Stops_times {
 
   static build_trips() {
         for (var i = 0; i < Stops_times.formatted_stop_times.length; i++) {
+          var k=0;
             for (var j = i; j < Stops_times.formatted_stop_times.length; j++) {
                 if (Stops_times.formatted_stop_times[i].trip_id==Stops_times.formatted_stop_times[j].trip_id){
                     if (Stops_times.formatted_stop_times[i].stop_sequence==Stops_times.formatted_stop_times[j].stop_sequence+1){
+                      k++;
                         Stops_times.formatted_stop_times[i].pred=Stops_times.formatted_stop_times[j];
                         Stops_times.formatted_stop_times[j].succ=Stops_times.formatted_stop_times[i];
                     }
                     if (Stops_times.formatted_stop_times[j].stop_sequence==Stops_times.formatted_stop_times[i].stop_sequence+1){
+                      k++;
                         Stops_times.formatted_stop_times[j].pred=Stops_times.formatted_stop_times[i];
                         Stops_times.formatted_stop_times[i].succ  =Stops_times.formatted_stop_times[j];
                     }
+                    if (k==2)break;
                 }
             }
         }
@@ -69,8 +74,8 @@ export class Stops_times {
   public static stops_times = [ {
       "_id": 1,
       "trip_id": 426077,
-      "arr": 2800,
-      "dep": 2800,
+      "arr": 28000,
+      "dep": 28000,
       "stop_id": 8001,
       "stop_sequence": 1,
       "is_terminus": true,
@@ -79,10 +84,8 @@ export class Stops_times {
 {
       "_id": 2,
       "trip_id": 426077,
-     /* "arr": 27585,
-      "dep": 27585,*/
-       "arr": 3200,
-      "dep": 3200,
+      "arr": 28700,
+      "dep": 28700,
       "stop_id": 387,
       "stop_sequence": 2,
       "is_terminus": true,
@@ -91,10 +94,8 @@ export class Stops_times {
 {
       "_id": 3,
       "trip_id": 426077,
-     /* "arr": 27620,
-      "dep": 27620,*/
-       "arr": 3900,
-      "dep": 3900,
+      "arr": 29000,
+      "dep": 29000,
       "stop_id": 388,
       "stop_sequence": 3,
       "is_terminus": true,
@@ -103,10 +104,8 @@ export class Stops_times {
 {
       "_id": 4,
       "trip_id": 426077,
-     /* "arr": 27660,
-      "dep": 27660,*/
-       "arr": 4500,
-      "dep": 4500,
+      "arr": 30000,
+      "dep": 30000,
       "stop_id": 389,
       "stop_sequence": 4,
       "is_terminus": true,
@@ -115,11 +114,29 @@ export class Stops_times {
 {
       "_id": 5,
       "trip_id": 426077,
-      /*"arr": 276840,
-      "dep": 276840,*/
-       "arr": 5000,
-      "dep": 5000,
+      "arr": 31000,
+      "dep": 31000,
       "stop_id": 390,
+      "stop_sequence": 5,
+      "is_terminus": true,
+      "is_head": true
+    },
+    {
+      "_id": 6,
+      "trip_id": 426077,
+      "arr": 33000,
+      "dep": 33000,
+      "stop_id": 391,
+      "stop_sequence": 5,
+      "is_terminus": true,
+      "is_head": true
+    },
+    {
+      "_id": 7,
+      "trip_id": 426077,
+      "arr": 37000,
+      "dep": 37000,
+      "stop_id": 392,
       "stop_sequence": 5,
       "is_terminus": true,
       "is_head": true

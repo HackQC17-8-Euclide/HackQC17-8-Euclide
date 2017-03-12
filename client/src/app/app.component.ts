@@ -34,6 +34,7 @@ export class AppComponent implements OnInit, AfterContentInit {
   private positions: Array<Pos>;
   private posi: Pos;
   private acces: couple<Pos, number>[];
+  private accesV: couple<Pos, number>[];
   private buses = new L.LayerGroup([]);
   private maps = new L.LayerGroup([]);
   private accessi = new L.LayerGroup([]);
@@ -102,6 +103,7 @@ export class AppComponent implements OnInit, AfterContentInit {
         this.initMap(pos[0], pos[1]);
         this.posi = pos;
         this.AffichageAccessibilite(parseInt(document.getElementById('fader').getAttributeNode('value').value) * 60, pos);
+        this.AffichageAccessibiliteVelo(parseInt(document.getElementById('fader').getAttributeNode('value').value) * 60, pos);
       });
 
   }
@@ -111,22 +113,25 @@ export class AppComponent implements OnInit, AfterContentInit {
     })
     this.acces = accessibilite.accessibilites(pos, tpsEnSec, this.tempsActuel());
     for (var i of this.acces) {
-      this.accessi.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2 * 1000));
+      this.accessi.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2*1000 ,{
+        stroke:false,color:'green'
+      }));
+
     }
-    this.accessi.addTo(this.map);
+   this.accessi.addTo(this.map);
 
   }
     AffichageAccessibiliteVelo(tpsEnSec: number, pos: Pos) {
     this.accessiVelo.eachLayer((layer: any) => {
       this.accessiVelo.removeLayer(layer);
     })
-    this.acces = accessibilite.accessibilites(pos, tpsEnSec, this.tempsActuel());
-    for (var i of this.acces) {
-      this.accessiVelo.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2 * 1000,{stroke:false,color: 'red',
-        fillColor: 'green'}));
+    this.accesV = accessibilite.accessibilitesV(pos, tpsEnSec, this.tempsActuel());
+    for (var i of this.accesV) {
+      this.accessiVelo.addLayer(L.circle([i.arg1[0], i.arg1[1]], i.arg2*1000,{
+        stroke:false,color:'blue'}));
     }
     this.accessiVelo.addTo(this.map);
-
+//console.log(this.accesV);
   }
   tick() {
     this.time = new Date();
@@ -159,6 +164,7 @@ export class AppComponent implements OnInit, AfterContentInit {
   updateOutput(event: any, output: any) {
     output.value = String(event.target.value) + ' min';
     this.AffichageAccessibilite(parseInt(output.value) * 60, this.posi);
+    this.AffichageAccessibiliteVelo(parseInt(output.value) * 60, this.posi);
   }
 
   initLocation() {
@@ -202,6 +208,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     let marker = L.marker([lat, long]).addTo(this.map);
     var circle = L.circle([lat, long], radius,
       {
+        stroke:false,
         color: 'red',
         fillColor: '#f03',
       }).addTo(this.map);
@@ -213,6 +220,7 @@ export class AppComponent implements OnInit, AfterContentInit {
       if (i !== undefined) {
         latitu = i.lat
         longit = i.long
+    
       }
     }
     let myIcon = L.icon({

@@ -35,7 +35,6 @@ export class pos_bus {
         //calcul de la position des bus
         let positions = new Array<Pos>();
         for (var stop_ref of Hash_pred) {
-
             if (stop_ref !== undefined && stop_ref.succ !== undefined && stop_ref.succ !== null) {
                 //console.log('stop_ref');
                 var lat1 = stop_ref.stop.lat;
