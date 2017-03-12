@@ -3,7 +3,7 @@
 namespace HackQC17_8_Euclide\GFTS;
 
 class GtfsRouteController extends GtfsElemController {
-    function __construct($path, $CurGtfsCtrl) {
+    function __construct($path, $CurGtfsCtrl, $options=[]) {
         global $DB;
         $this->table = 'gtfs_route';
         $this->DB_fields_mapping = [
@@ -18,7 +18,7 @@ class GtfsRouteController extends GtfsElemController {
             'route_text_color' => 'string',
             'agency_pk' => 'int'
         ];
-        parent::__construct($path, $CurGtfsCtrl);
+        parent::__construct($path, $CurGtfsCtrl, $options);
         $this->primaryFieldKeyList = 'route_id';
     }
 
