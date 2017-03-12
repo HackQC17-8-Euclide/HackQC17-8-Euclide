@@ -16,7 +16,6 @@ const DIGIT_LIMIT = 10;
 
 
 export class AppComponent implements OnInit, AfterContentInit {
-  static currentPos: any;
   private map: any;
   private timer: Observable<any>;
   private time: Date;
@@ -58,8 +57,14 @@ export class AppComponent implements OnInit, AfterContentInit {
   }
 
   ngAfterContentInit() {
-    this.initLocation();
-    this.initMap(45.404476, -71.888351);
+    this.initLocation()
+      .catch(() => {
+        this.initMap(45.404476, -71.888351);
+      })
+      .then((pos: any) => {
+        this.initMap(pos[0], pos[1]);
+      });
+
   }
   tick() {
     this.time = new Date();
@@ -94,11 +99,16 @@ export class AppComponent implements OnInit, AfterContentInit {
   }
 
   initLocation() {
-    navigator.geolocation.getCurrentPosition(this.getPos, this.getErrorFromLocation, this.options);
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition((position: any) => {
+        resolve([position.coords.latitude, position.coords.longitude]);
+      });
+    });
   }
 
-  getPos(pos) {
-    AppComponent.currentPos = pos.coords;
+  getPos(pos): Promise<any> {
+
+    return pos.coords;
   }
 
   getErrorFromLocation(error) {
@@ -143,13 +153,12 @@ export class AppComponent implements OnInit, AfterContentInit {
     //   .attr("stroke", "#ccc")
     //   .attr("stroke-width", 0.2)
     //   .attr("fill", function (d) { return d.color; });
-    this.markCurrentLocation();
+    this.markCurrentLocation(lat, long);
   }
-  markCurrentLocation() {
+  markCurrentLocation(lat: number, long: number) {
 
     // let svg = d3.select(this.map.getPanes().overlayPane).append("svg"),
     //   g = svg.append("g").attr("class", "leaflet-zoom-hide");
-
     // let g_position = g.append('g').attr('class', 'g_position'),
     //   g_stops = g.append('g').attr('class', 'g_stops');
     // let projection = d3.geoMercator();
@@ -162,13 +171,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     //   .attr("cy", (d: any) => { return projection(d)[1]; })
     //   .attr("r", "15")
     //   .attr("fill", "green")
-     var marker = L.marker([45.404476, -71.888351]).addTo(this.map);
-                L.circle([45.404476, -71.888351], {
-            color: 'red',
-            fillColor: 'green',
-            fillOpacity: 0.5,
-            radius: 500
-        }).addTo(this.map);
+    let marker = L.marker([lat, long]).addTo(this.map);
 
   }
 
@@ -181,4 +184,4 @@ export class AppComponent implements OnInit, AfterContentInit {
     return this.map.latLngToLayerPoint(new L.LatLng(lat, lng));
   }
 
-  }
+}
