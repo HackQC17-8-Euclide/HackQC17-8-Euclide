@@ -22,32 +22,7 @@ export class Stop{
 
 export class Stops{
   static formatted_stops:Stop[] = new Array<Stop>();
-  static stops=[{
-    "_id": 8001,
-    "lat": 45.402270,
-    "long": -71.952806
-  },
-{
-    "_id": 387,
-    "lat": 45.402842,
-    "long": -71.949091
-  },
-{
-    "_id": 388,
-    "lat": 45.403509,
-    "long": -71.946575
-  },
-{
-    "_id": 389,
-    "lat": 45.403664,
-    "long": -71.942874
-  },
-{
-    "_id": 390,
-    "lat": 45.403733,
-    "long": -71.939510
-  },
-];
+  static stops=[];
 
 
 

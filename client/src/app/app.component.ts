@@ -1,8 +1,11 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterContentInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
-import { pos_bus } from './services/pos_bus'
-import { accessibilite } from './services/accessibilite'
+import { RequestService } from './services/request.service';
+import { pos_bus } from './services/pos_bus';
+import { accessibilite } from './services/accessibilite';
+import { Stops } from './services/Stops';
+import { Stops_times } from './services/Stops_times';
 import * as d3 from 'd3';
 
 const DIGIT_LIMIT = 10;
@@ -11,11 +14,9 @@ const DIGIT_LIMIT = 10;
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [MapService],
+  providers: [MapService, RequestService],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-
-
 
 export class AppComponent implements OnInit, AfterContentInit {
   private map: any;
@@ -25,21 +26,54 @@ export class AppComponent implements OnInit, AfterContentInit {
   private minutes: string;
   private seconds: string;
   private stream: any;
-  
   private options = {
     enableHighAccuracy: true,
     timeout: 5000,
     maximumAge: 0
   };
 
-  constructor(private mapService: MapService, private changeDetector: ChangeDetectorRef) {
+  constructor(private mapService: MapService, private requestService: RequestService, private changeDetector: ChangeDetectorRef) {
     this.timer = Observable.timer(1000, 1000);
-
   }
 
+  private handleError(error: any): Promise<any> {
+    console.error('An error occurred', error); // for demo purposes only
+    return Promise.reject(error.message || error);
+  }
 
+  refreshStop() {
+    this.requestService.getStops()
+      .then((data: any) => {
+        Stops.stops = JSON.parse(data);
+         console.log(data);
+        Stops.compute_formatted_stops();
+      }
+
+      )
+      .catch((error: any) => {
+        this.handleError(error);
+      }
+
+      );
+  }
+
+  refreshStopTime() {
+    this.requestService.getStopTimes()
+      .then((data: any) => {
+        Stops_times.stops_times = JSON.parse(data);
+        console.log(data);
+        Stops_times.compute_formatted_stop_times();
+      }
+      )
+      .catch((error: any) => {
+        this.handleError(error);
+      }
+      );
+
+  }
   ngOnInit() {
-
+    this.refreshStop();
+    this.refreshStopTime();
     this.timer.subscribe(
       //onNext
       () => {
@@ -158,7 +192,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     //   .attr("fill", function (d) { return d.color; });
     this.markCurrentLocation(lat, long);
   }
-  markCurrentLocation(lat: number, long: number,radius:number=50) {
+  markCurrentLocation(lat: number, long: number, radius: number = 50) {
 
     // let svg = d3.select(this.map.getPanes().overlayPane).append("svg"),
     //   g = svg.append("g").attr("class", "leaflet-zoom-hide");
