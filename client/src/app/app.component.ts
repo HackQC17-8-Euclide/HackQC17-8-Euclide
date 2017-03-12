@@ -1,10 +1,16 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit, AfterContentInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
+import { accessibilite,couple } from './services/accessibilite'
+import { Stops } from './services/Stops'
+import {pos_bus,Pos} from './services/pos_bus'
+
 import * as d3 from 'd3';
 
 const DIGIT_LIMIT = 10;
-
+ let latitu 
+ let longit
+ 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -16,7 +22,6 @@ const DIGIT_LIMIT = 10;
 
 
 export class AppComponent implements OnInit, AfterContentInit {
-  static currentPos: any;
   private map: any;
   private timer: Observable<any>;
   private time: Date;
@@ -24,6 +29,12 @@ export class AppComponent implements OnInit, AfterContentInit {
   private minutes: string;
   private seconds: string;
   private stream: any;
+  private positions: Array<Pos>;
+  private posi:Pos;
+  private acces:couple<Pos, number>[];
+   tempsActuel():number{
+    return parseInt(this.hours)*3600+parseInt(this.minutes)*60+parseInt(this.seconds);
+   }
   private options = {
     enableHighAccuracy: true,
     timeout: 5000,
@@ -32,7 +43,17 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   constructor(private mapService: MapService, private changeDetector: ChangeDetectorRef) {
     this.timer = Observable.timer(1000, 1000);
-
+     //this.positions = pos_bus.get_pos_bus(tempsActuel());
+     this.positions = pos_bus.get_pos_bus(27600);
+     this.posi= new Pos();
+     for(let i of this.positions){
+       if(i !==undefined){
+         latitu =i.lat
+         longit=i.long
+       }
+     }
+    
+       // console.log(longit); 
   }
 
 
@@ -58,8 +79,19 @@ export class AppComponent implements OnInit, AfterContentInit {
   }
 
   ngAfterContentInit() {
-    this.initLocation();
-    this.initMap(45.404476, -71.888351);
+    this.initLocation()
+      .catch(() => {
+        this.initMap(45.404476, -71.888351);
+      })
+      .then((pos: any) => {
+        this.initMap(pos[0], pos[1]);
+        this.acces = accessibilite.accessibilites(pos,parseInt(document.getElementById('fader').getAttribute('value')),this.tempsActuel());
+        console.log(this.acces);
+    });
+      
+   
+  
+    
   }
   tick() {
     this.time = new Date();
@@ -94,11 +126,16 @@ export class AppComponent implements OnInit, AfterContentInit {
   }
 
   initLocation() {
-    navigator.geolocation.getCurrentPosition(this.getPos, this.getErrorFromLocation, this.options);
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition((position: any) => {
+        resolve([position.coords.latitude, position.coords.longitude]);
+      });
+    });
   }
 
-  getPos(pos) {
-    AppComponent.currentPos = pos.coords;
+  getPos(pos): Promise<any> {
+
+    return pos.coords;
   }
 
   getErrorFromLocation(error) {
@@ -109,7 +146,7 @@ export class AppComponent implements OnInit, AfterContentInit {
     this.map = L.map('mapId', {
       zoomControl: false,
       center: L.latLng(lat, long),
-      zoom: 12,
+      zoom: 17,
       minZoom: 5,
       maxZoom: 20
     });
@@ -117,7 +154,7 @@ export class AppComponent implements OnInit, AfterContentInit {
       attribution:
       'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,' +
       '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-      maxZoom: 18,
+      maxZoom: 20,
       id: 'digitalglobe.nako6329',
       accessToken: 'pk.eyJ1IjoiZWxjYXJpc21hIiwiYSI6ImNqMDVtY2U0ZzBtczAzMnFycThhdTJncXQifQ.T8Yr0w4eBuccD_2q7KbMGQ'
     }).addTo(this.map);
@@ -143,13 +180,12 @@ export class AppComponent implements OnInit, AfterContentInit {
     //   .attr("stroke", "#ccc")
     //   .attr("stroke-width", 0.2)
     //   .attr("fill", function (d) { return d.color; });
-    this.markCurrentLocation();
+    this.markCurrentLocation(lat, long);
   }
-  markCurrentLocation() {
+  markCurrentLocation(lat: number, long: number, radius: number = 50) {
 
     // let svg = d3.select(this.map.getPanes().overlayPane).append("svg"),
     //   g = svg.append("g").attr("class", "leaflet-zoom-hide");
-
     // let g_position = g.append('g').attr('class', 'g_position'),
     //   g_stops = g.append('g').attr('class', 'g_stops');
     // let projection = d3.geoMercator();
@@ -162,14 +198,31 @@ export class AppComponent implements OnInit, AfterContentInit {
     //   .attr("cy", (d: any) => { return projection(d)[1]; })
     //   .attr("r", "15")
     //   .attr("fill", "green")
-     var marker = L.marker([45.404476, -71.888351]).addTo(this.map);
-                L.circle([45.404476, -71.888351], {
-            color: 'red',
-            fillColor: 'green',
-            fillOpacity: 0.5,
-            radius: 500
-        }).addTo(this.map);
-
+    let marker = L.marker([lat, long]).addTo(this.map);
+    var circle = L.circle([lat, long], radius,
+      {
+        color: 'red',
+        fillColor: '#f03',
+        //fillOpacity: 0.5,
+      }).addTo(this.map);
+    // let point_position=L.circle([latitu,longit],20, {
+    //     color: 'green',
+    //     fillColor: '#f03',
+    //     //fillOpacity: 0.5,
+    //   }).addTo(this.map);
+    let ico = L.divIcon({className: 'my-div-icon'});
+      let myIcon = L.icon({
+        iconUrl: '../icon_bus.png',
+       // iconRetinaUrl: 'my-icon@2x.png',
+        iconSize: [38, 50],
+        iconAnchor: [22, 94],
+        popupAnchor: [-3, -76],
+       // shadowUrl: 'my-icon-shadow.png',
+        //shadowRetinaUrl: 'my-icon-shadow@2x.png',
+        shadowSize: [68, 95],
+        shadowAnchor: [22, 94]
+      })
+    let icon =L.marker([latitu, longit],{icon:myIcon}).addTo(this.map);
   }
 
   projectPoint(x, y) {
@@ -181,4 +234,4 @@ export class AppComponent implements OnInit, AfterContentInit {
     return this.map.latLngToLayerPoint(new L.LatLng(lat, lng));
   }
 
-  }
+}
