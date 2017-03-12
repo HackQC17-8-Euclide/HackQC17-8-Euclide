@@ -3,7 +3,17 @@
 namespace HackQC17_8_Euclide\GFTS;
 
 class GtfsShapeController extends GtfsElemController {
-    public $spatialExtent = null;
+    function __construct($path, $CurGtfsCtrl) {
+        global $DB;
+        $this->table = 'gtfs_shape';
+        $this->DB_fields_mapping = [
+            'shape_id' => 'string',
+            'agency_pk' => 'int',
+            'route_pk' => 'int',
+        ];
+        parent::__construct($path, $CurGtfsCtrl);
+        $this->primaryFieldKeyList = 'shape_id';
+    }
     public function parseData($elem) {
         if (!isset($this->list[$elem['shape_id']]))
             $this->list[$elem['shape_id']] = [
@@ -22,5 +32,12 @@ class GtfsShapeController extends GtfsElemController {
         // if (!empty($this->CurGtfsCtrl->StopCtrl))
         //     $stop['stop_id'] = $this->CurGtfsCtrl->StopCtrl->fetchStopIdFromCoords([$stop['shape_pt_lon'], $stop['shape_pt_lat']]);
         $this->list[$elem['shape_id']]['stops'][$elem['shape_pt_sequence']] = $stop;
+    }
+    public function parseDateForInsert($elem) {
+        return [
+            'shape_id' => $elem['shape_id'],
+            'route_pk' => $this->CurGtfsCtrl->RouteCtrl->getPk($elem['route_id']),
+            'agency_pk' => $this->CurGtfsCtrl->AgencyCtrl->curAgencyPk
+        ];
     }
 }

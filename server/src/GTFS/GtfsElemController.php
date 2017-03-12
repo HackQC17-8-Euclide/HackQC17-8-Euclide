@@ -11,7 +11,8 @@ class GtfsElemController {
     public $DB_fields_mapping;
     function __construct($path, $CurGtfsCtrl) {
         $this->timeLoad = null;
-        $this->timeInsert = null;
+        $this->timeInsert = 0;
+        $this->primaryFieldKeyList = 'pk';
         $this->CurGtfsCtrl = $CurGtfsCtrl;
         $this->list = [];
         if (file_exists($path))
@@ -23,11 +24,11 @@ class GtfsElemController {
         $start = microtime(true);
 
         $fp = fopen($path, 'r');
-        $count = -1;
+        $this->countRows = -1;
         $keys = [];
         $keysHasKey = [];
         while (($data = fgetcsv($fp, 0, ",")) !== FALSE) {
-            if ($count < 0) {
+            if ($this->countRows < 0) {
                 $keys = $data;
                 foreach ($keys as $k => $v)
                     $keysHasKey[$v] = trim($k);
@@ -37,7 +38,7 @@ class GtfsElemController {
                     $elem[$keys[$k]] = trim($v);
                 $this->parseData($elem);
             }
-            $count ++;
+            $this->countRows ++;
         }
         fclose($fp);
 
@@ -45,34 +46,45 @@ class GtfsElemController {
         return $this->list;
     }
 
-    public function export() {
+    public function export($fetch=true) {
         global $DB;
         $this->DB_fields_mapping;
         $start = microtime(true);
+        $startBis = microtime(true);
         $headSql = "INSERT INTO $this->table (".implode(', ', array_keys($this->DB_fields_mapping)).") VALUES ";
         $rowsSql = []; $count = 0;
-        foreach ($this->list as $key => $elem) {
+        foreach ($this->list as $k => $elem) {
             $elem = $this->parseDateForInsert($elem);
             $fieldsForInsert = [];
             foreach ($this->DB_fields_mapping as $key => $type)
                 $fieldsForInsert[$key] = ($type=='string')?'"'.str_replace('"', '', $elem[$key]).'"':((empty($elem[$key]) && $elem[$key]!==0)?'null':$elem[$key]*1);
             $rowsSql[] = str_replace('""', "NULL", '('.implode(', ', $fieldsForInsert).')');
             $count++;
+            if ($count >= 1000) {
+                // var_dump($headSql . implode(", ", $rowsSql));
+                $DB->exec($headSql . implode(", ", $rowsSql));
+                echo "  import $this->table: ".$count." en ".$this->timeInsert."s<br>\n";
+                $rowsSql = []; $count = 0;
+            }
         }
         if ($count) {
+            // var_dump($headSql . implode(", ", $rowsSql));
             $DB->exec($headSql . implode(", ", $rowsSql));
-            $this->timeInsert = round(microtime(true)-$start, 2);
-            echo "  import $this->table: ".$count." en ".$this->timeInsert."s<br>\n";
+            $tBis = round(microtime(true)-$start, 5);
+            echo "  import $this->table: ".$count." en ".$tBis."s<br>\n";
+            $startBis = microtime(true);
         }
+        $this->timeInsert = round(microtime(true)-$start, 5);
         // Fetch data !!
-        $this->fetchDataDB();
+        if ($fetch)
+            $this->fetchDataDB();
     }
     public function fetchDataDB() {
         global $DB;
         $res = $DB->query("SELECT * FROM $this->table");
         $this->list = [];
         foreach ($res as $val) {
-            $this->list[$val['pk']] = $this->mapValue($val);
+            $this->list[$val[$this->primaryFieldKeyList]] = $this->mapValue($val);
         }
     }
     public function mapValue($elem) {
@@ -91,9 +103,11 @@ class GtfsElemController {
     }
     public static function hourMinToSec($hourMin) {
         $hourMin = explode(':', $hourMin);
-        return $hourMin[0]*60*60 + $hourMin[1]*60 + (!empty($hourMin[2]))?$hourMin:0;
+        return $hourMin[0]*60*60 + $hourMin[1]*60 + (!empty($hourMin[2])?$hourMin[2]:0);
     }
     public static function yyyymmddToIsoDate($yyyymmdd) {
+        if (strpos($yyyymmdd, '-') !==-1)
+            return $yyyymmdd;
         if (empty($yyyymmdd))
             return null;
         return substr($yyyymmdd, 0, 4).'-'.substr($yyyymmdd, 4, 2).'-'.substr($yyyymmdd, 6, 2);
@@ -111,5 +125,12 @@ class GtfsElemController {
             if ($spatialExtent['lat'][1] < $coords[1]) // max
                 $spatialExtent['lat'][1] = $coords[1];
         }
+    }
+
+    public function getPk($id) {
+        if (isset($this->list[$id]) && isset($this->list[$id]['pk']))
+            return $this->list[$id]['pk'];
+        else
+            return null;
     }
 }

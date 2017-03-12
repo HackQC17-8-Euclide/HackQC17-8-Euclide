@@ -3,7 +3,28 @@
 namespace HackQC17_8_Euclide\GFTS;
 
 class GtfsTripController extends GtfsElemController {
-    public $spatialExtent = null;
+    function __construct($path, $CurGtfsCtrl) {
+        global $DB;
+        $this->table = 'gtfs_trip';
+        $this->DB_fields_mapping = [
+            'trip_id' => 'string',
+            'route_pk' => 'int',
+            'agency_pk' => 'int',
+            'service_id' => 'string',
+            'shape_pk' => 'int',
+            'trip_headsign' => 'string',
+            'block_id' => 'string',
+            'trip_short_name' => 'string',
+            'direction_id' => 'string',
+            'departure_time' => 'string',
+            'arrival_time' => 'string',
+            'departure_sec' => 'int',
+            'arrival_sec' => 'int',
+        ];
+        parent::__construct($path, $CurGtfsCtrl);
+        $this->primaryFieldKeyList = 'trip_id';
+    }
+
     public function parseData($elem) {
         if (!isset($this->CurGtfsCtrl->CalendarCtrl->list[$elem['service_id']]) && !isset($this->CurGtfsCtrl->CalendarDateCtrl->list[$elem['service_id']]))
             throw new \Exception("Service inconnu! ".json_encode($elem), 1);
@@ -25,7 +46,7 @@ class GtfsTripController extends GtfsElemController {
             'departure_sec' => null,
             'arrival_sec' => null
         ];
-        if (!empty($trip['shape_id']) && !empty($this->CurGtfsCtrl->ShapeCtrl)) {
+        if (!empty($trip['shape_id']) && !empty($this->CurGtfsCtrl->ShapeCtrl)) { // On essaie de dire pour une shape à quelle route elle appartient
             if (!isset($this->CurGtfsCtrl->ShapeCtrl->list[$trip['shape_id']])) { // ben ils ont oublié d'ajouter un shape dans le GTFS...
                 $this->CurGtfsCtrl->ShapeCtrl->list[$trip['shape_id']] = [
                     'shape_id' => $trip['shape_id'],
@@ -37,5 +58,22 @@ class GtfsTripController extends GtfsElemController {
             $this->CurGtfsCtrl->ShapeCtrl->list[$trip['shape_id']]['route_id'] = $trip['route_id'];
         }
         $this->list[$trip['trip_id']] = $trip;
+    }
+    public function parseDateForInsert($elem) {
+        return [
+            'trip_id' => $elem['trip_id'],
+            'route_pk' => $this->CurGtfsCtrl->RouteCtrl->getPk($elem['route_id']),
+            'agency_pk' => $this->CurGtfsCtrl->AgencyCtrl->curAgencyPk,
+            'service_id' => $elem['service_id'],
+            'shape_pk' => $this->CurGtfsCtrl->ShapeCtrl->getPk($elem['shape_id']),
+            'trip_headsign' => $elem['trip_headsign'],
+            'block_id' => $elem['block_id'],
+            'trip_short_name' => $elem['trip_short_name'],
+            'direction_id' => $elem['direction_id'],
+            'departure_time' => $elem['departure_time'],
+            'arrival_time' => $elem['arrival_time'],
+            'departure_sec' => $elem['departure_sec'],
+            'arrival_sec' => $elem['arrival_sec']
+        ];
     }
 }

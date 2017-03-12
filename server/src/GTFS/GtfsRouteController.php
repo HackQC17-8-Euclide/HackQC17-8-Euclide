@@ -3,7 +3,25 @@
 namespace HackQC17_8_Euclide\GFTS;
 
 class GtfsRouteController extends GtfsElemController {
-    public $spatialExtent = null;
+    function __construct($path, $CurGtfsCtrl) {
+        global $DB;
+        $this->table = 'gtfs_route';
+        $this->DB_fields_mapping = [
+            'route_id' => 'string',
+            'agency_id' => 'string',
+            'route_short_name' => 'string',
+            'route_long_name' => 'string',
+            'route_desc' => 'string',
+            'route_type' => 'string',
+            'route_url' => 'string',
+            'route_color' => 'string',
+            'route_text_color' => 'string',
+            'agency_pk' => 'int'
+        ];
+        parent::__construct($path, $CurGtfsCtrl);
+        $this->primaryFieldKeyList = 'route_id';
+    }
+
     public function parseData($elem) {
     	if (empty($elem['route_id']))
     		throw new \Exception("route_id empty ! ".json_encode($elem), 1);
@@ -24,10 +42,26 @@ class GtfsRouteController extends GtfsElemController {
 			'route_short_name' => $elem['route_short_name'],
 			'route_long_name' => $elem['route_long_name'],
 			'route_desc' => !isset($elem['route_desc'])?null:$elem['route_desc'],
-			'route_type' => !isset($elem['route_type'])?3:$elem['route_type'],
+			'route_type' => !isset($elem['route_type'])?3:$elem['route_type']*1,
 			'route_url' => !isset($elem['route_url'])?null:$elem['route_url'],
 			'route_color' => !isset($elem['route_color'])?null:$elem['route_color'],
 			'route_text_color' => !isset($elem['route_text_color'])?null:$elem['route_text_color']
         ];
     }
+
+    public function parseDateForInsert($elem) {
+        return [
+            'route_id' => $elem['route_id'],
+            'agency_id' => $elem['agency_id'],
+            'route_short_name' => $elem['route_short_name'],
+            'route_long_name' => $elem['route_long_name'],
+            'route_desc' => $elem['route_desc'],
+            'route_type' => $elem['route_type'],
+            'route_url' => $elem['route_url'],
+            'route_color' => $elem['route_color'],
+            'route_text_color' => $elem['route_text_color'],
+            'agency_pk' => $this->CurGtfsCtrl->AgencyCtrl->curAgencyPk
+        ];
+    }
+
 }
