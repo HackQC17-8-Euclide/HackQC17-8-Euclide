@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Rx';
 import { MapService } from './services/map.service';
 import { RequestService } from './services/request.service';
 import { accessibilite, couple } from './services/accessibilite'
-import { Stops } from './services/Stops'
+import { Stops,Stop } from './services/Stops'
 import { Stops_times } from './services/Stops_times'
 
 import { pos_bus, Pos } from './services/pos_bus'
@@ -65,11 +65,11 @@ export class AppComponent implements OnInit, AfterContentInit {
     this.reqserv.getStops()
       .then((res) => {
         Stops.stops = res;
-        console.log(Stops.stops);
+        // console.log(Stops.stops);
         Stops.compute_formatted_stops();
 
       }).catch(error => {
-        console.log('plantage');
+        // console.log('plantage');
       }).then(() => {
         this.reqserv.getStopTimes()
           .then((res) => {
@@ -79,7 +79,7 @@ export class AppComponent implements OnInit, AfterContentInit {
             this.affichageBus();
           });
       }).catch(error => {
-        console.log('plantage');
+        // console.log('plantage');
       });
 
 
@@ -126,13 +126,15 @@ export class AppComponent implements OnInit, AfterContentInit {
         this.initMap(45.404476, -71.888351);
       })
       .then((pos: any) => {
-        console.log('cur pos', pos);
-        
+        // console.log('cur pos', pos);
+
         this.initMap(pos[0], pos[1]);
         this.posi = pos;
         this.AffichageAccessibilite(parseInt(document.getElementById('fader').getAttributeNode('value').value) * 60, pos);
         this.AffichageAccessibiliteVelo(parseInt(document.getElementById('fader').getAttributeNode('value').value) * 60, pos);
+        this.affichageStop();
       });
+
 
   }
   AffichageAccessibilite(tpsEnSec: number, pos: Pos) {
@@ -169,9 +171,9 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   formatTimer() {
     var dateIso = this.time.toTimeString();
-    this.hours = dateIso.substr(0,2);
-    this.minutes = dateIso.substr(3,2);
-    this.seconds = dateIso.substr(6,2);
+    this.hours = dateIso.substr(0, 2);
+    this.minutes = dateIso.substr(3, 2);
+    this.seconds = dateIso.substr(6, 2);
   }
 
   updateOutput(event: any, output: any) {
@@ -216,26 +218,26 @@ export class AppComponent implements OnInit, AfterContentInit {
 
     this.markCurrentLocation(lat, long);
 
-    
+
     this.reqserv.getStops()
       .then((res) => {
         Stops.stops = res;
-        console.log('Stops.stops', Stops.stops);
+        // console.log('Stops.stops', Stops.stops);
         Stops.compute_formatted_stops();
         this.affichageStop();
       }).catch(error => {
-        console.log('plantage 1', error);
+        // console.log('plantage 1', error);
       });
 
-      this.reqserv.getStopTimes()
-        .then((res) => {
-          Stops_times.stops_times = res;
-          console.log('Stops_times.stops_times');
-          Stops_times.compute_formatted_stop_times();
-          // this.affichageBus();
-        }).catch(error => {
-          console.log('plantage 2', error);
-        });
+    this.reqserv.getStopTimes()
+      .then((res) => {
+        Stops_times.stops_times = res;
+        // console.log('Stops_times.stops_times');
+        Stops_times.compute_formatted_stop_times();
+        // this.affichageBus();
+      }).catch(error => {
+        // console.log('plantage 2', error);
+      });
   }
   markCurrentLocation(lat: number, long: number, radius: number = 50) {
 
@@ -250,7 +252,7 @@ export class AppComponent implements OnInit, AfterContentInit {
 
   affichageBus() {
     this.positions = pos_bus.get_pos_bus(this.tempsActuel());
-    console.log(this.positions)
+    //console.log(this.positions)
     let myIcon = L.icon({
       iconUrl: '../icon_bus.png',
       iconSize: [38, 50],
@@ -272,6 +274,11 @@ export class AppComponent implements OnInit, AfterContentInit {
     }
     this.buses.addTo(this.map);
   }
+  compare(n1, n2) {
+    // console.log(accessibilite.distance(n1.pos, this.posi) - accessibilite.distance(n2.pos, this.posi));
+    // console.log(accessibilite.distance(n1.pos, n1.pos));
+    return accessibilite.distance(n1.pos, this.posi) - accessibilite.distance(n2.pos, this.posi);
+  }
   affichageStop() {
     var posit = Stops.formatted_stops;
     let myIcon = L.icon({
@@ -283,10 +290,13 @@ export class AppComponent implements OnInit, AfterContentInit {
       shadowAnchor: [22, 94]
     })
     let count = 0;
-    console.log(this.map, 'this.map');
+    console.log('posi',this.posi);
     
-    for (var i of posit) {
-      if (i !== undefined && count < 30) {
+    var sorrtedArray: Array<Stop> = posit.sort((n1, n2) => -1*this.compare(n1, n2));
+
+    // console.log(this.map, 'this.map');
+    for (var i of sorrtedArray) {
+      if (i !== undefined && count < 500) {
         this.map.addLayer(L.marker([i.lat, i.long], { icon: myIcon }))
         count++;
       } else break;
