@@ -14,8 +14,8 @@ if (!file_exists($GTFS_path)) { mkdir($GTFS_path);
 
 // echo "<h2>Import RTCS_Shawinigan</h2><br>\n";
 // $RTCS_Shawinigan = new \HackQC17_8_Euclide\GFTS\GtfsController($GTFS_path.'RTCS_Shawinigan/');
-echo "<h2>Import RTL_Longueuil</h2><br>\n";
-$RTL_Longueuil = new \HackQC17_8_Euclide\GFTS\GtfsController($GTFS_path.'RTL_Longueuil/');
+// echo "<h2>Import RTL_Longueuil</h2><br>\n";
+// $RTL_Longueuil = new \HackQC17_8_Euclide\GFTS\GtfsController($GTFS_path.'RTL_Longueuil/');
 // echo "<h2>Import STS_Sherbrooke</h2><br>\n";
 // $STS_Sherbrooke = new \HackQC17_8_Euclide\GFTS\GtfsController($GTFS_path.'STS_Sherbrooke/');
 // echo "<h2>Import STO_Gatineau</h2><br>\n";
@@ -26,5 +26,5 @@ $RTL_Longueuil = new \HackQC17_8_Euclide\GFTS\GtfsController($GTFS_path.'RTL_Lon
 // $STL_Laval = new \HackQC17_8_Euclide\GFTS\GtfsController($GTFS_path.'STL_Laval/');
 // echo "<h2>Import RTC_Quebec</h2><br>\n";
 // $RTC_Quebec = new \HackQC17_8_Euclide\GFTS\GtfsController($GTFS_path.'RTC_Quebec/');
-// echo "<h2>Import STM_Montreal</h2><br>\n";
-// $STM_Montreal = new \HackQC17_8_Euclide\GFTS\GtfsController($GTFS_path.'STM_Montreal/');
+echo "<h2>Import STM_Montreal</h2><br>\n";
+$STM_Montreal = new \HackQC17_8_Euclide\GFTS\GtfsController($GTFS_path.'STM_Montreal/');

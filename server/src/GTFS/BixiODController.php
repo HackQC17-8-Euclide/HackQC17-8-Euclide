@@ -50,3 +50,21 @@ class BixiODController extends GtfsElemController {
         ];
     }
 }
+
+// SELECT date(start_date) date_start,
+//     COUNT(*) count_day,
+//     count(case when hour(start_date) >= 15 AND hour(start_date) < 19 then 1 else null end) count_afternoon,
+//     count(case when hour(start_date) >= 19 AND hour(start_date) <= 23 then 1 else null end) count_evening
+// FROM `bixi_od`
+// WHERE
+//     start_stop IN ('6021', '6003', '6738', '6202', '7066', '7067', '7069', '6007', '6008', '6203', '6009', '6901', '7074', '6012', '6013', '6209', '7077', '6014', '6015', '6018', '6214', '6019', '6020', '6413', '6180', '6073', '6078', '6081', '6034', '6083', '6729')
+// GROUP BY date(start_date)
+
+// SELECT date(end_date) date_end,
+//     COUNT(*) count_day,
+//     count(case when hour(end_date) >= 15 AND hour(end_date) < 19 then 1 else null end) count_afternoon,
+//     count(case when hour(end_date) >= 19 AND hour(end_date) <= 23 then 1 else null end) count_evening
+// FROM `bixi_od`
+// WHERE
+//     end_stop IN ('6021', '6003', '6738', '6202', '7066', '7067', '7069', '6007', '6008', '6203', '6009', '6901', '7074', '6012', '6013', '6209', '7077', '6014', '6015', '6018', '6214', '6019', '6020', '6413', '6180', '6073', '6078', '6081', '6034', '6083', '6729')
+// GROUP BY date(end_date)

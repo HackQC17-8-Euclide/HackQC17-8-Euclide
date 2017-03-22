@@ -32,10 +32,10 @@ class GtfsController {
         // gtfs_frequency
         // gtfs_shape_stops
 
-
         $this->AgencyCtrl = new \HackQC17_8_Euclide\GFTS\GtfsAgencyController($this->path.'agency.txt', $this);
         if (!empty($this->AgencyCtrl->curAgencyPk)) {
             $DB->exec("DELETE FROM gtfs_stop_times WHERE agency_pk = ".$this->AgencyCtrl->curAgencyPk);
+            $DB->exec("DELETE FROM gtfs_frequency WHERE agency_pk = ".$this->AgencyCtrl->curAgencyPk);
             $DB->exec("DELETE FROM gtfs_trip WHERE agency_pk = ".$this->AgencyCtrl->curAgencyPk);
             $DB->exec("DELETE FROM gtfs_shape WHERE agency_pk = ".$this->AgencyCtrl->curAgencyPk);
             $DB->exec("DELETE FROM gtfs_calendar_dates WHERE agency_pk = ".$this->AgencyCtrl->curAgencyPk);
@@ -59,6 +59,8 @@ class GtfsController {
         $this->ShapeCtrl->export();
         $this->TripCtrl->export();
         $this->TripCtrl->fetchDataDB();
+        $this->FrequencyCtrl = new \HackQC17_8_Euclide\GFTS\GtfsFrenquencyController($this->path.'frequencies.txt', $this);
+        $this->FrequencyCtrl->export();
         $this->StopTimeCtrl = new \HackQC17_8_Euclide\GFTS\GtfsStopTimeController($this->path.'stop_times.txt', $this, ['autoExport'=>true]);
         $this->TripCtrl->update(['departure_time', 'arrival_time', 'departure_sec', 'arrival_sec']);
         $this->timeLoad = [
