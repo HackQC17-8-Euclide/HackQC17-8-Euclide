@@ -10,6 +10,7 @@ $DB = new \HackQC17_8_Euclide\DB($confSQL['sql_host'], $confSQL['sql_user'], $co
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
 if (empty($_GET['api_key']) || $_GET['api_key'] != $conf['api_key']) {
+    http_response_code(500);
     echo json_encode(['error'=>'mauvaise api_key']);
     die();
 }
@@ -21,7 +22,10 @@ if (empty($_GET['lng']))
     $errors[] = 'Entrez la longitude recherchee';
 if (empty($_GET['lat']))
     $errors[] = 'Entrez la latitude recherchee';
+if (isset($_GET['agency_pk']) && (empty($_GET['agency_pk']) || !is_numeric($_GET['agency_pk']) || !HackQC17_8_Euclide\GFTS\GtfsAgencyController::agencyExists($_GET['agency_pk']) ))
+    $errors[] = 'agency_pk invalide';
 if (!empty($errors)) {
+    http_response_code(500);
     echo json_encode(['errors'=>$errors]);
     die();
 }
@@ -29,44 +33,25 @@ if (!empty($errors)) {
 $curDatetime = $_GET['cur_datetime'];
 $curDate = substr($_GET['cur_datetime'], 0, 10);
 $coords = [$_GET['lng'], $_GET['lat']];
+$agency_pk = isset($_GET['agency_pk']) ? $_GET['agency_pk']*1 : null;
 
-// $sql = "SELECT *
-$sql = "SELECT DISTINCT c.service_id
-        FROM gtfs_calendar_dates cd
-            LEFT JOIN gtfs_calendar c ON c.service_id = cd.service_id
-        WHERE (
-               cd.date = :curDatetime AND cd.exception_type = 1
-                OR
-               cd.date = :curDatetime AND cd.exception_type != 2 AND (
-                            WEEKDAY(:curDatetime)=0 AND c.monday = 1
-                   OR   WEEKDAY(:curDatetime)=1 AND c.tuesday = 1
-                   OR   WEEKDAY(:curDatetime)=2 AND c.wednesday = 1
-                   OR   WEEKDAY(:curDatetime)=3 AND c.thursday = 1
-                   OR   WEEKDAY(:curDatetime)=4 AND c.friday = 1
-                   OR   WEEKDAY(:curDatetime)=5 AND c.saturday = 1
-                   OR   WEEKDAY(:curDatetime)=6 AND c.sunday = 1
-               )
-        )";
-$services = $DB->query($sql, ['curDatetime' => $curDate]);
-if (empty($services)) {
+$service_ids = HackQC17_8_Euclide\GFTS\GtfsCalendarController::fetchDateServices($curDate, $agency_pk);
+if (empty($service_ids)) {
+    http_response_code(500);
     echo json_encode(['error'=>'Pas de service disponible pour la journée du: '.$curDate]);
     die();
 }
-// echo "Services filtrés: ".count($services)."<br>\n";
-$service_ids = [];
-foreach ($services as $v)
-    $service_ids[] = $v['service_id'];
-
-
+$whereAgency = empty($agency_pk)?'':'st.agency_pk = '.($agency_pk*1).' AND ';
 // $sql = "SELECT st.pk, st.route_pk, st.agency_pk, st.shape_pk, st.trip_headsign, st.direction_id, st.departure_time, st.arrival_time, st.service_id, a.agency_id
 $sql = "SELECT st.pk
         FROM gtfs_trip st
             LEFT JOIN gtfs_agency a ON a.pk = st.agency_pk
-        WHERE st.departure_time < DATE_ADD(:curDatetime, INTERVAL 30 MINUTE)
+        WHERE $whereAgency st.departure_time < DATE_ADD(:curDatetime, INTERVAL 30 MINUTE)
             AND st.arrival_time > DATE_SUB(:curDatetime, INTERVAL 10 MINUTE)
             AND st.service_id IN (".'"'.implode('", "', $service_ids).'"'.")";
 $trips = $DB->query($sql, ['curDatetime' => $curDatetime]);
 if (empty($trips)) {
+    http_response_code(500);
     echo json_encode(['error'=>'Pas de trip pour cette date - heure: '.$curDatetime]);
     die();
 }
@@ -74,9 +59,10 @@ if (empty($trips)) {
 $trip_pk = [];
 foreach ($trips as $v)
     $trip_pk[] = $v['pk'];
+$whereAgency = empty($agency_pk)?'':'agency_pk = '.($agency_pk*1).' AND ';
 $sql = "SELECT stop_pk stop_id, trip_pk trip_id, arrival_sec arr, departure_sec dep, stop_sequence
         FROM gtfs_stop_times st
-         where agency_pk = 18 AND st.trip_pk IN (".implode(', ', $trip_pk).") ";
+         where $whereAgency st.trip_pk IN (".implode(', ', $trip_pk).") ";
 $stopTimes = $DB->query($sql, ['curDatetime' => $curDatetime]);
 foreach ($stopTimes as $key => $value)
     $stopTimes[$key] = [
@@ -88,6 +74,7 @@ foreach ($stopTimes as $key => $value)
     ];
 
 if (empty($stopTimes)) {
+    http_response_code(500);
     echo json_encode(['error'=>'Pas de stop times trouvés ... O.o le '.$curDatetime]);
     die();
 }

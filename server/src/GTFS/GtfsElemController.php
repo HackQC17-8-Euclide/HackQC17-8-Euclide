@@ -17,19 +17,20 @@ class GtfsElemController {
         $this->primaryFieldKeyList = 'pk';
         $this->CurGtfsCtrl = $CurGtfsCtrl;
         $this->list = [];
+        $separator = !empty($this->options['separator'])?$this->options['separator']:',';
         if (file_exists($path))
-            $this->readFile($path);
+            $this->readFile($path, $separator);
         $this->count = count($this->list);
     }
 
-    public function readFile($path) {
+    public function readFile($path, $separator=',') {
         $start = microtime(true);
 
         $fp = fopen($path, 'r');
         $this->countRows = -1;
         $keys = [];
         $keysHasKey = [];
-        while (($data = fgetcsv($fp, 0, ",")) !== FALSE) {
+        while (($data = fgetcsv($fp, 0, $separator)) !== FALSE) {
             if ($this->countRows < 0) {
                 $keys = $data;
                 foreach ($keys as $k => $v)
@@ -114,6 +115,8 @@ class GtfsElemController {
     }
 
     public function fetchDataDB() {
+        if (empty($this->CurGtfsCtrl->AgencyCtrl))
+            return [];
         global $DB;
         $res = $DB->query("SELECT * FROM $this->table WHERE agency_pk = ".$this->CurGtfsCtrl->AgencyCtrl->curAgencyPk);
         $this->list = [];

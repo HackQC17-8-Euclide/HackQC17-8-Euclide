@@ -37,6 +37,10 @@ class GtfsAgencyController extends GtfsElemController {
         $this->list = [];
         $this->list[$res['agency_id']] = $this->mapValue($res);
     }
+    public static function agencyExists($pk) {
+        global $DB;
+        return !empty($DB->queryFirst("SELECT pk from gtfs_agency where pk = :pk", ['pk'=>$pk]));
+    }
     public function parseData($elem) {
     	// agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone
         if (!isset($elem['agency_id']))

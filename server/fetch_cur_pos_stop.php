@@ -10,6 +10,7 @@ $DB = new \HackQC17_8_Euclide\DB($confSQL['sql_host'], $confSQL['sql_user'], $co
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
 if (empty($_GET['api_key']) || $_GET['api_key'] != $conf['api_key']) {
+    http_response_code(500);
     echo json_encode(['error'=>'mauvaise api_key']);
     die();
 }
@@ -21,7 +22,8 @@ if (empty($_GET['api_key']) || $_GET['api_key'] != $conf['api_key']) {
 //     $errors[] = 'Entrez la longitude recherchee';
 // if (empty($_GET['lat']))
 //     $errors[] = 'Entrez la latitude recherchee';
-// if (!empty($errors)) {
+// if (!empty($errors))
+//     http_response_code(500);
 //     echo json_encode(['errors'=>$errors]);
 //     die();
 // }
@@ -36,6 +38,7 @@ foreach ($stops as $key => $value)
         'long' => 1*$value['long']
     ];
 if (empty($stops)) {
+    http_response_code(500);
     echo json_encode(['error'=>'Pas de stop en BDD']);
     die();
 }
