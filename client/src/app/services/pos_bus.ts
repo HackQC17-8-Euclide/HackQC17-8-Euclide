@@ -20,7 +20,7 @@ export class pos_bus {
     public static get_pos_bus(temps_actuel: number): Pos[] {
         //Stops.compute_formatted_stops();
         //Stops_times.compute_formatted_stop_times();
-        console.log('Stops_times.formatted_stop_times', Stops_times.formatted_stop_times);
+        // console.log('Stops_times.formatted_stop_times', Stops_times.formatted_stop_times);
         let Hash_pred = new Array<Stop_time>();
         //calcul du dernier arrêt du bus
         for (var stop_time of Stops_times.formatted_stop_times) {            
